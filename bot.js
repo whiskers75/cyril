@@ -65,6 +65,23 @@ bot.on('nick', function(oldn, newn) {
 	delete proles[oldn];
     }
 });
+bot.on('join#cywolf', function(nick) {
+    if (nick == 'cywolf') {
+	return;
+    }
+    if (phase == 'joins') {
+	bot.say(nick, 'Welcome to Cywolf!');
+	bot.say(nick, 'Join the game with !join.');
+        bot.say(nick, 'Don\'t know how to play? http://bit.ly/mafia-wikipedia');
+    }
+    else {
+	bot.say(nick, 'Welcome to Cywolf!');
+	bot.say(nick, 'There\'s currently a game in progress, but when it\'s finished you can join the game with !join.');
+        bot.say(nick, 'Don\'t know how to play? http://bit.ly/mafia-wikipedia');
+    }
+    bot.say(nick, c.blue('Cywolf is in beta!') + ' Help by submitting bug reports at bit.ly/cywolfbugs, and please bear with us!');
+    bot.say(nick, 'One last thing - ' + c.bold('please don\'t idle') + '. It\'s annoying for other players.');
+});
 bot.on('part#cywolf', function(nick) {
     console.log('part: ' + nick);
     if (players.indexOf(nick) !== -1) {
@@ -390,23 +407,18 @@ function reset() {
     process.wolves = [];
     process.seer = '';
     process.doppelganger = '';
-    var unvoice = [];
-    var deop = [];
     Object.keys(process.names).forEach(function(name) {
         if (name == 'cywolf') {
             return;
         }
         if (process.names[name] == '+') {
-	    unvoice.push(name);
             bot.send('MODE', '#cywolf', '-v', name);
         }
-        if (process.names[name] == '@') {
-	    deop.push(name);
+        if (process.names[name] == '@' && name != 'cywolf') {
             bot.send('MODE', '#cywolf', '-o', name);
             bot.send('MODE', '#cywolf', '-v', name);
         }
     });
-    bot.say('ChanServ', 'OP #cywolf cywolf');
     phase = 'joins';
     players = [];
     dead = [];
@@ -423,6 +435,7 @@ bot.on('registered', function() {
     wreset = true;
     bot.join('#cywolf');
     bot.send('NICK', 'cywolf');
+    bot.say('ChanServ', 'OP #cywolf cywolf');
     winston.info('Cywolf started');
 });
 bot.on('message', function(nick, to, text, raw) {
