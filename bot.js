@@ -345,6 +345,8 @@ function allocRoles() {
     return true;
 }
 function night() {
+    killed = '';
+    lynches = {};
     winston.info('It is now night.');
     phase = 'night';
     if (allocRoles()) {
