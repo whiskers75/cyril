@@ -348,7 +348,7 @@ function night() {
     winston.info('It is now night.');
     phase = 'night';
     if (allocRoles()) {
-	bot.say('#cywolf', c.black(c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).'));
+	bot.say('#cywolf', c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).');
 	timer = setTimeout(function() {
 	    if (phase == 'night') {
 		day();
