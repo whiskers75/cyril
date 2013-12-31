@@ -9,6 +9,7 @@
 	"irc": "*",
 	"jade": "*",
 	"winston": "*",
-	"irc-colors": "*"
+	"irc-colors": "*",
+	"chance": "*"
     }
 }
