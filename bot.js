@@ -296,7 +296,6 @@ function allocRoles() {
     bot.say(process.seer, c.green('You are a ') + c.bold.green('seer!'));
     bot.say(process.seer, 'Players to see: ' + players.join(', '));
     bot.say(process.seer, 'PM me "see [player]" when you have made your choice.');
-    bot.say(process.cursed, 'You are cursed to be seen as a wolf, while still being a villager!');
     players.forEach(function(player) {
 	if (!proles[player]) {
 	    proles[player] = 'villager';
