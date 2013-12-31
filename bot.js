@@ -433,7 +433,7 @@ bot.on('message', function(nick, to, text, raw) {
 	if (process.names && rate) {
 	    var pingarray = [];
 	    Object.keys(process.names).forEach(function(name) {
-		if (players.indexOf(name) !== -1 && name !== 'cywolf') {
+		if (players.indexOf(name) == -1 && name !== 'cywolf') {
 		    pingarray.push(name);
 		}
 	    });
