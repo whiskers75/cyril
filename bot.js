@@ -431,7 +431,13 @@ bot.on('message', function(nick, to, text, raw) {
     }
     if (text == '!ping') {
 	if (process.names && rate) {
-	    bot.say('#cywolf', 'PING! ' + Object.keys(process.names).join(' '));
+	    var pingarray = [];
+	    Object.keys(process.names).forEach(function(name) {
+		if (players.indexOf(name) !== -1 && name !== 'cywolf') {
+		    pingarray.push(name);
+		}
+	    });
+	    bot.say('#cywolf', 'PING! ' + pingarray.join(' '));
 	    rate = false;
 	    setTimeout(function() {
 		rate = true;
@@ -484,7 +490,7 @@ bot.on('message', function(nick, to, text, raw) {
 	lynches[nick] = target;
 	checkLynches();
     }
-    if (text == '!join' && phase == 'joins') {
+    if (text.split(' ')[0] == '!join' && phase == 'joins') {
 	if (players.indexOf(nick) !== -1) {
 	    return bot.notice(nick, 'You are already playing.');
 	}
@@ -497,7 +503,7 @@ bot.on('message', function(nick, to, text, raw) {
             bot.say('#cywolf', c.bold(nick) + ' (' + raw.host + ') has joined Cywolf. ' + c.bold(players.length) + ' have joined so far.');
 	}
     }
-    if (text == '!leave' && players.indexOf(nick) !== -1) {
+    if ((text.split(' ')[0] == '!leave' || text.split(' ')[0] == '!quit') && players.indexOf(nick) !== -1) {
 	players.splice(players.indexOf(nick), 1);
         bot.send('MODE', '#cywolf', '-v', nick);
         bot.say('#cywolf', c.bold(nick) + ' (' + raw.host + ') died of an unknown disease. ' + c.bold(players.length) + ' still remain.');
