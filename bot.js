@@ -68,7 +68,9 @@ bot.on('nick', function(oldn, newn) {
 bot.on('part#cywolf', function(nick) {
     console.log('part: ' + nick);
     if (players.indexOf(nick) !== -1) {
-	bot.say('#cywolf', c.bold(nick) + ' didn\'t get out of bed for a long time and died. It appears he/she was a ' + c.bold(proles[nick]) + '.');
+	if (phase !== 'joins') {
+	    bot.say('#cywolf', c.bold(nick) + ' didn\'t get out of bed for a long time and died. It appears he/she was a ' + c.bold(proles[nick]) + '.');
+	}
         players.splice(players.indexOf(killed), 1);
         if (killed == taken) {
             proles[process.doppelganger] = proles[killed];
