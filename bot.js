@@ -246,6 +246,10 @@ function kill(target, wolf) {
 	bot.say(wolf, c.bold.red('That person is not playing.'));
 	return;
     }
+    if (target == wolf) {
+	bot.say(wolf, 'Suicide is not permitted.');
+	return;
+    }
     killed = target;
     bot.say(wolf, c.red('You have selected ') + c.bold.red(killed) + c.red(' to die.'));
     checkDay();
@@ -264,6 +268,10 @@ function see(player, seer) {
 	    player = p;
 	}
     });
+    if (player == seer) {
+	bot.say(seer, 'You see that yourself is a seer. You hit yourself on the head and see a proper person.');
+	return;
+    }
     if (players.indexOf(player) == -1) {
         bot.say(seer, c.bold.red('That person is not playing.'));
         return;
