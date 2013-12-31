@@ -370,6 +370,7 @@ bot.on('message', function(nick, to, text, raw) {
 	bot.say('#cywolf', c.bold.red('Shutting down cywolf... (via command)'));
 	setTimeout(function() {
 	    bot.disconnect();
+	    process.exit(0);
 	}, 1000);
     }
     if (nick == 'whiskers75' && text == '!freset') {
@@ -478,7 +479,8 @@ bot.on('error', function(err) {
     console.log(JSON.stringify(err));
 });
 process.on('SIGTERM', function() {
-    bot.say('#cywolf', 'Bot shutting down! (killed by console)');
+    bot.say('#cywolf', c.bold.red('Bot shutting down! (killed by console)'));
+    process.exit(0);
 });
 process.on('uncaughtException', function(err) {
     bot.say('#cywolf', c.bold.red('- ERROR: ' + err));
