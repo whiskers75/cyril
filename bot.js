@@ -254,7 +254,7 @@ function kill(target, wolf) {
 	return;
     }
     players.forEach(function(p) {
-        if (p.toLowerCase().indexOf(target) !== -1) {
+        if (p.indexOf(target) !== -1) {
             target = p;
         }
     });
@@ -280,7 +280,7 @@ function see(player, seer) {
 	return;
     }
     players.forEach(function(p) {
-	if (p.toLowerCase().indexOf(player) !== -1) {
+	if (p.indexOf(player) !== -1) {
 	    player = p;
 	}
     });
@@ -496,7 +496,7 @@ bot.on('message', function(nick, to, text, raw) {
     if ((text.split(' ')[0] == '!lynch' || text.split(' ')[0] == '!vote') && phase == 'day') {
 	var target = text.split(' ')[1];
         players.forEach(function(p) {
-            if (p.toLowerCase().indexOf(target) !== -1) {
+            if (p.indexOf(target) !== -1) {
                 target = p;
             }
         });
@@ -541,7 +541,7 @@ bot.on('message', function(nick, to, text, raw) {
         if (text.split(' ')[0] == 'take' && proles[nick] == 'doppelganger') {
             taken = text.split(' ')[1];
             players.forEach(function(p) {
-                if (p.toLowerCase().indexOf(taken) !== -1) {
+                if (p.indexOf(taken) !== -1) {
                     taken = p;
                 }
             });
