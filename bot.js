@@ -9,6 +9,7 @@ var players = [];
 var rate = true;
 var phase = 'joins';
 var dead = [];
+var taken = '';
 var lynches = {};
 var firstnight = true;
 var proles = {};
@@ -68,6 +69,12 @@ bot.on('part#cywolf', function(nick) {
     if (players.indexOf(nick) !== -1) {
 	bot.say('#cywolf', c.bold(nick) + ' didn\'t get out of bed for a long time and died. It appears he/she was a ' + c.bold(proles[nick]) + '.');
         players.splice(players.indexOf(killed), 1);
+        if (killed == taken) {
+            proles[process.doppelganger] = proles[killed];
+            bot.say(process.doppelganger, 'You are now a ' + c.bold(proles[killed]) + '!');
+            process[(proles[killed] == 'cursed villager' ? 'cursed' : proles[killed])] = process.doppelganger;
+            process.doppelganger = '';
+        }
         bot.send('MODE', '#cywolf', '-v', killed);
         var wv = 0;
         var vi = 0;
@@ -112,6 +119,12 @@ function day() {
 	bot.say('#cywolf', 'The corpse of ' + c.bold(killed) + ' is found. Upon searching his/her pockets, it was revealed that he/she was a ' + c.bold(proles[killed]) + '.');
 	players.splice(players.indexOf(killed), 1);
         bot.send('MODE', '#cywolf', '-v', killed);
+	if (killed == taken) {
+	    proles[process.doppelganger] = proles[killed];
+	    bot.say(process.doppelganger, 'You are now a ' + c.bold(proles[killed]) + '!');
+	    process[(proles[killed] == 'cursed villager' ? 'cursed' : proles[killed])] = process.doppelganger;
+	    process.doppelganger = '';
+	}
 	var wv = 0;
 	var vi = 0;
 	players.forEach(function(p) {
@@ -165,6 +178,12 @@ function lynch(killed) {
     bot.say('#cywolf', 'As ' + c.bold(killed) + ' is being dragged to be lynched, he/she throws a grenade on the ground. It explodes early and ' + killed + ' dies.');
     bot.say('#cywolf', 'Upon searching his/her pockets, it was revealed that the villagers lynched a ' + c.bold(proles[killed]) + '.');
     players.splice(players.indexOf(killed), 1);
+    if (killed == taken) {
+        proles[process.doppelganger] = proles[killed];
+        bot.say(process.doppelganger, 'You are now a ' + c.bold(proles[killed]) + '!');
+        process[(proles[killed] == 'cursed villager' ? 'cursed' : proles[killed])] = process.doppelganger;
+        process.doppelganger = '';
+    }
     bot.send('MODE', '#cywolf', '-v', killed);
     var wv = 0;
     var vi = 0;
@@ -283,6 +302,13 @@ function allocRoles() {
 	    roled.push(process.cursed);
 	    players.splice(players.indexOf(process.cursed), 1);
 	}
+	if (players.length >= 5) {
+            process.doppelganger = players[chance.integer({min: 0, max: players.length - 1})];
+	    proles[process.doppelganger] = 'doppelganger';
+	    winston.info('Allocated doppelganger');
+	    roled.push(process.doppelganger);
+	    players.splice(players.indexOf(process.cursed), 1);
+	}
 	roled.forEach(function(player) { // Restore players
 	    players.push(player);
 	});
@@ -296,6 +322,11 @@ function allocRoles() {
     bot.say(process.seer, c.green('You are a ') + c.bold.green('seer!'));
     bot.say(process.seer, 'Players to see: ' + players.join(', '));
     bot.say(process.seer, 'PM me "see [player]" when you have made your choice.');
+    if (process.doppelganger) {
+	bot.say(process.doppelganger, 'You are a ' + c.bold.purple('doppelganger!'));
+	bot.say(process.doppelganger, 'Choose someone to assume the role of (when they die).');
+	bot.say(process.doppelganger, 'PM me "take [player]" when you have made your choice.');
+    }
     players.forEach(function(player) {
 	if (!proles[player]) {
 	    proles[player] = 'villager';
@@ -328,6 +359,8 @@ function reset() {
     bot.send('#cywolf', c.red('Please wait, resetting Cywolf...'));
     bot.send('MODE', '#cywolf', '-m');
     process.wolves = [];
+    process.seer = '';
+    process.doppelganger = '';
     var unvoice = [];
     var deop = [];
     Object.keys(process.names).forEach(function(name) {
@@ -349,6 +382,7 @@ function reset() {
     players = [];
     dead = [];
     proles = {};
+    taken = '';
     lynches = {};
     killed = false;
     firstnight = true;
@@ -406,7 +440,7 @@ bot.on('message', function(nick, to, text, raw) {
 	bot.say('#cywolf', c.bold(players.length) + ' players: ' + players.join(', '));
     }
     if (text == '!roles') {
-	bot.say('#cywolf', '[4] wolf/seer [6] cursed villager [more?] not implemented');
+        bot.say('#cywolf', '[4] wolf/seer [6] cursed villager [8] doppelganger (https://en.wikipedia.org/wiki/Ultimate_Werewolf#Roles)');
     }
     if (text == '!start') {
 	if (players.length >= 4) {
@@ -472,6 +506,19 @@ bot.on('message', function(nick, to, text, raw) {
 	if (text.split(' ')[0] == 'kill' && proles[nick] == 'wolf') {
 	    kill(text.split(' ')[1], nick);
 	}
+        if (text.split(' ')[0] == 'take' && proles[nick] == 'doppelganger') {
+            taken = text.split(' ')[1];
+            players.forEach(function(p) {
+                if (p.indexOf(taken) !== -1) {
+                    taken = p;
+                }
+            });
+            if (players.indexOf(taken) == -1) {
+                bot.notice(nick, 'That player does not exist.');
+                return;
+            }
+	    bot.say(nick, 'You have chosen to assume the role of ' + c.bold(taken) + '.');
+        }
     }
 });
 bot.on('error', function(err) {
