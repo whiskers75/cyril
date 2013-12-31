@@ -185,7 +185,7 @@ function day() {
     killed = false;
     seen = false;
     
-    bot.say('#cywolf', 'The villagers must now decide who to lynch with ' + c.bold('!lynch [player]') + '. A majority of ' + c.bold(players.length - Number((players.length / 1.5).toFixed(0))) + ' votes will lynch.');
+    bot.say('#cywolf', 'The villagers must now decide who to lynch with ' + c.bold('!lynch [player]') + '. A majority of ' + c.bold(players.length - (players.length - 1 + (players.length > 4 ? 1 : 0))) + ' votes will lynch.');
     bot.say('#cywolf', 'The villagers only have ' + c.bold('4 minutes') + ' to decide, otherwise the sun will set and night will start ' + c.bold('without warning') + '.');
     timer = setTimeout(function() {
         if (phase == 'day') {
@@ -255,7 +255,7 @@ function checkLynches() {
     Object.keys(votes).forEach(function(vote) {
 	var voted = votes[vote];
 	winston.info('votes for ' + voted + ': ' + vote);
-	if (voted >= (players.length - 1)) {
+        if (voted >= (players.length - 1 + (players.length > 4 ? 1 : 0))) {
 	    winston.info('lynching');
 	    lynch(vote);
 	    return;
