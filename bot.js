@@ -1,3 +1,6 @@
+String.prototype.repeat = function( num ) {
+    return new Array( num + 1 ).join( this );
+};
 var irc = require('irc');
 var c = require('irc-colors');
 var winston = require('winston');
@@ -78,7 +81,18 @@ function day() {
 	    if (wv == 0) {
 		bot.say('#cywolf', 'All the wolves are now dead.');
 	    }
+	    if (vi == 0) {
+		bot.say('#cywolf', 'All the villagers are now dead.');
+	    }
 	    bot.say('#cywolf', c.bold('Game over!') + ' The ' + (wv == 0 ? c.bold.green('villagers') : c.bold.red('wolves')) + ' win!');
+	    var endStr = '';
+	    Object.keys(proles).forEach(function(name) {
+		if (proles[name] == 'villager') {
+		    return;
+		}
+		endStr += name + ' was a ' + c.bold(proles[name]) + '. ';
+	    });
+	    bot.say('#cywolf', endStr);
 	    reset();
 	    return;
 	}
@@ -145,7 +159,7 @@ function checkLynches() {
 	}
     });
 }
-	
+
 function checkDay() {
     if (killed && seen) {
 	day();
@@ -174,6 +188,10 @@ function see(player, seer) {
         bot.say(seer, c.bold.red('It is not night.'));
         return;
     }
+    if (seen) {
+	bot.say(seer, 'You have already seen.');
+	return;
+    }
     players.forEach(function(p) {
 	if (p.indexOf(player) !== -1) {
 	    player = p;
@@ -189,33 +207,33 @@ function see(player, seer) {
 }
 function allocRoles() {
     if (firstnight) {
-    winston.info('Allocating roles..');
+	winston.info('Allocating roles..');
 	var roled = []; // Players with roles
         var wolf = players[chance.integer({min: 0, max: players.length - 1})];
-    process.wolves.push(wolf);
-    proles[wolf] = 'wolf';
-    roled.push(wolf);
-    winston.info('Allocated wolf');
-    players.splice(players.indexOf(wolf), 1); // To avoid 'wolfseers'
-    if (players.length < 1) {
-        roled.forEach(function(player) { // Restore players
-            players.push(player);
-        });
-	bot.say('#cywolf', c.bold.red('Role allocation error. Not enough players?'));
-	reset();
-	return false;
-    }
-    process.seer = players[chance.integer({min: 0, max: players.length - 1})];
-    proles[process.seer] = 'seer';
-    winston.info('Allocated seer');
-    roled.forEach(function(player) { // Restore players
-	players.push(player);
-    });
+	process.wolves.push(wolf);
+	proles[wolf] = 'wolf';
+	roled.push(wolf);
+	winston.info('Allocated wolf');
+	players.splice(players.indexOf(wolf), 1); // To avoid 'wolfseers'
+	if (players.length < 1) {
+            roled.forEach(function(player) { // Restore players
+		players.push(player);
+            });
+	    bot.say('#cywolf', c.bold.red('Role allocation error. Not enough players?'));
+	    reset();
+	    return false;
+	}
+	process.seer = players[chance.integer({min: 0, max: players.length - 1})];
+	proles[process.seer] = 'seer';
+	winston.info('Allocated seer');
+	roled.forEach(function(player) { // Restore players
+	    players.push(player);
+	});
 	roled = [];
     }
     process.wolves.forEach(function(wolf) {
-    bot.say(wolf, 'You are a ' + c.bold.red('wolf!'));
-    bot.say(wolf, 'Players to ' + c.red('kill') + ': ' + players.join(', '));
+	bot.say(wolf, 'You are a ' + c.bold.red('wolf!'));
+	bot.say(wolf, 'Players to ' + c.red('kill') + ': ' + players.join(', '));
 	bot.say(wolf, 'PM me "kill [player]" when you have made your choice.');
     });
     bot.say(process.seer, c.green('You are a ') + c.bold.green('seer!'));
@@ -234,12 +252,12 @@ function night() {
     winston.info('It is now night.');
     phase = 'night';
     if (allocRoles()) {
-    bot.say('#cywolf', c.black(c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).'));
-    timer = setTimeout(function() {
-	if (phase == 'night') {
-	    day();
-	}
-    }, 120000);
+	bot.say('#cywolf', c.black(c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).'));
+	timer = setTimeout(function() {
+	    if (phase == 'night') {
+		day();
+	    }
+	}, 120000);
     }
 }
 function start() {
@@ -253,14 +271,18 @@ function reset() {
     bot.send('#cywolf', c.red('Please wait, resetting Cywolf...'));
     bot.send('MODE', '#cywolf', '-m');
     process.wolves = [];
+    var unvoice = [];
+    var deop = [];
     Object.keys(process.names).forEach(function(name) {
         if (name == 'cywolf') {
             return;
         }
         if (process.names[name] == '+') {
+	    unvoice.push(name);
             bot.send('MODE', '#cywolf', '-v', name);
         }
         if (process.names[name] == '@') {
+	    deop.push(name);
             bot.send('MODE', '#cywolf', '-o', name);
             bot.send('MODE', '#cywolf', '-v', name);
         }
@@ -307,10 +329,14 @@ bot.on('message', function(nick, to, text, raw) {
     if (nick == 'whiskers75' && text == '!fstart') {
 	start();
     }
-    if (nick == 'whiskers75' && text == '!ping') {
-	if (process.names) {
+    if (text == '!ping') {
+	var rate = true;
+	if (process.names && true) {
 	    bot.say('#cywolf', 'PING! ' + Object.keys(process.names).join(' '));
 	}
+    }
+    if (text == '!away') {
+	bot.send('KICK', '#cywolf', nick, 'Leave if you want to idle!');
     }
     if (text == '!stats') {
 	bot.say('#cywolf', c.bold(players.length) + ' players: ' + players.join(', '));
