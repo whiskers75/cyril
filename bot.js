@@ -75,7 +75,6 @@ bot.on('part#cywolf', function(nick) {
             process[(proles[killed] == 'cursed villager' ? 'cursed' : proles[killed])] = process.doppelganger;
             process.doppelganger = '';
         }
-        bot.send('MODE', '#cywolf', '-v', killed);
         var wv = 0;
         var vi = 0;
         players.forEach(function(p) {
@@ -197,7 +196,24 @@ function lynch(killed) {
     });
     clearTimeout(timer);
     if (wv >= vi || vi == 0 || wv == 0) {
+        if (wv >= vi) {
+            bot.say('#cywolf', 'The wolves, being the same number as the villagers, can now overpower everyone. They do so, and win.');
+        }
+        if (wv == 0) {
+            bot.say('#cywolf', 'All the wolves are now dead.');
+        }
+        if (vi == 0) {
+            bot.say('#cywolf', 'All the villagers are now dead.');
+        }
         bot.say('#cywolf', c.bold('Game over!') + ' The ' + (wv == 0 ? c.bold.green('villagers') : c.bold.red('wolves')) + ' win!');
+        var endStr = '';
+        Object.keys(proles).forEach(function(name) {
+            if (proles[name] == 'villager') {
+                return;
+            }
+            endStr += name + ' was a ' + c.bold(proles[name]) + '. ';
+        });
+        bot.say('#cywolf', endStr);
         reset();
         return;
     }
@@ -238,7 +254,7 @@ function kill(target, wolf) {
 	return;
     }
     players.forEach(function(p) {
-        if (p.indexOf(target) !== -1) {
+        if (p.toLowerCase().indexOf(target) !== -1) {
             target = p;
         }
     });
@@ -264,7 +280,7 @@ function see(player, seer) {
 	return;
     }
     players.forEach(function(p) {
-	if (p.indexOf(player) !== -1) {
+	if (p.toLowerCase().indexOf(player) !== -1) {
 	    player = p;
 	}
     });
@@ -480,7 +496,7 @@ bot.on('message', function(nick, to, text, raw) {
     if ((text.split(' ')[0] == '!lynch' || text.split(' ')[0] == '!vote') && phase == 'day') {
 	var target = text.split(' ')[1];
         players.forEach(function(p) {
-            if (p.indexOf(target) !== -1) {
+            if (p.toLowerCase().indexOf(target) !== -1) {
                 target = p;
             }
         });
@@ -525,7 +541,7 @@ bot.on('message', function(nick, to, text, raw) {
         if (text.split(' ')[0] == 'take' && proles[nick] == 'doppelganger') {
             taken = text.split(' ')[1];
             players.forEach(function(p) {
-                if (p.indexOf(taken) !== -1) {
+                if (p.toLowerCase().indexOf(taken) !== -1) {
                     taken = p;
                 }
             });
