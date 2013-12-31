@@ -185,13 +185,13 @@ function day() {
     killed = false;
     seen = false;
     
-    bot.say('#cywolf', 'The villagers must now decide who to lynch with ' + c.bold('!lynch [player]') + '. A majority of ' + c.bold(players.length - 1) + ' votes will lynch.');
-    bot.say('#cywolf', 'The villagers only have 5 minutes to decide, otherwise the sun will set and night will start.');
+    bot.say('#cywolf', 'The villagers must now decide who to lynch with ' + c.bold('!lynch [player]') + '. A majority of ' + c.bold(players.length - Number((players.length / 1.5).toFixed(0))) + ' votes will lynch.');
+    bot.say('#cywolf', 'The villagers only have ' + c.bold('4 minutes') + ' to decide, otherwise the sun will set and night will start ' + c.bold('without warning') + '.');
     timer = setTimeout(function() {
         if (phase == 'day') {
             night();
         }
-    }, 300000);
+    }, 240000);
 }
 function lynch(killed) {
     bot.say('#cywolf', 'As ' + c.bold(killed) + ' is being dragged to be lynched, he/she throws a grenade on the ground. It explodes early and ' + killed + ' dies.');
@@ -506,8 +506,11 @@ bot.on('message', function(nick, to, text, raw) {
         bot.say('#cywolf', 'A goat walks by the village. It nearly took a bite out of ' + c.bold(Object.keys(process.names)[chance.integer({min: 0, max: Object.keys(process.names).length - 1})]) + '!');
     }
     if (text.split(' ')[0] == '!retract' && phase == 'day') {
-	lynches[nick] = 'nobody';
+	delete lynches[nick];
 	bot.say('#cywolf', c.bold(nick) + ' retracted his/her vote.');
+    }
+    if (text.split(' ')[0] == '!votes' && phase == 'day') {
+	bot.say('#cywolf', c.bold(Object.keys(lynches).length) + ' people have voted. Votes (JSON): ' + JSON.stringify(lynches));
     }
     if ((text.split(' ')[0] == '!lynch' || text.split(' ')[0] == '!vote') && phase == 'day') {
 	var target = text.split(' ')[1];
