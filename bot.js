@@ -249,7 +249,7 @@ function see(player, seer) {
         bot.say(seer, c.bold.red('That person is not playing.'));
         return;
     }
-    bot.say(seer, c.green('You have a vision, in that vision you see that ' + player + ' is a ') + c.bold.green(proles[player]) + c.green('!'));
+    bot.say(seer, c.green('You have a vision, in that vision you see that ' + player + ' is a ') + c.bold.green((proles[player] == 'cursed villager' ? 'wolf': proles[player])) + c.green('!'));
     seen = true;
     checkDay();
 }
@@ -274,6 +274,15 @@ function allocRoles() {
 	process.seer = players[chance.integer({min: 0, max: players.length - 1})];
 	proles[process.seer] = 'seer';
 	winston.info('Allocated seer');
+	roled.push(process.seer);
+	players.splice(players.indexOf(process.seer), 1);
+	if (players.length >= 4) {
+            process.cursed = players[chance.integer({min: 0, max: players.length - 1})];
+	    proles[process.cursed] = 'cursed villager';
+	    winston.info('Allocated cursed vil');
+	    roled.push(process.cursed);
+	    players.splice(players.indexOf(process.cursed), 1);
+	}
 	roled.forEach(function(player) { // Restore players
 	    players.push(player);
 	});
@@ -287,6 +296,7 @@ function allocRoles() {
     bot.say(process.seer, c.green('You are a ') + c.bold.green('seer!'));
     bot.say(process.seer, 'Players to see: ' + players.join(', '));
     bot.say(process.seer, 'PM me "see [player]" when you have made your choice.');
+    bot.say(process.cursed, 'You are cursed to be seen as a wolf, while still being a villager!');
     players.forEach(function(player) {
 	if (!proles[player]) {
 	    proles[player] = 'villager';
@@ -395,12 +405,15 @@ bot.on('message', function(nick, to, text, raw) {
     if (text == '!stats') {
 	bot.say('#cywolf', c.bold(players.length) + ' players: ' + players.join(', '));
     }
+    if (text == '!roles') {
+	bot.say('#cywolf', '[4] wolf/seer [6] cursed villager [more?] not implemented');
+    }
     if (text == '!start') {
 	if (players.length >= 4) {
 	    start();
 	}
 	else {
-	    bot.say('#cywolf', 'For now, 4 players need to be playing to use this.');
+	    bot.say('#cywolf', 'For now, 4 or more players need to be playing to use this.');
 	}
     }
     if (text == '!dead') {
