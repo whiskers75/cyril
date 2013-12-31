@@ -131,6 +131,7 @@ bot.on('part#cywolf', function(nick) {
     }
 });
 function day() {
+    if (!killed || killed && proles[killed]) {
     phase = 'day';
     firstnight = false;
     clearTimeout(timer);
@@ -194,6 +195,7 @@ function day() {
             night();
         }
     }, 240000);
+	}
 }
 function lynch(killed) {
     bot.say('#cywolf', 'As ' + c.bold(killed) + ' is being dragged to be lynched, he/she throws a grenade on the ground. It explodes early and ' + killed + ' dies.');
@@ -238,7 +240,6 @@ function lynch(killed) {
         bot.say('#cywolf', endStr);
         bot.say('#cywolf', c.bold('Please wait until you get the "Welcome to Cywolf" message before running commands.'));
         reset();
-        return;
     }
     else {
 	night();
