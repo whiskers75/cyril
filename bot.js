@@ -124,6 +124,7 @@ bot.on('part#cywolf', function(nick) {
                 endStr += name + ' was a ' + c.bold(proles[name]) + '. ';
             });
             bot.say('#cywolf', endStr);
+	    bot.say('#cywolf', c.bold('Please wait until you get the "Welcome to Cywolf" message before running commands.'));
             reset();
             return;
         }
@@ -173,6 +174,7 @@ function day() {
 		endStr += name + ' was a ' + c.bold(proles[name]) + '. ';
 	    });
 	    bot.say('#cywolf', endStr);
+            bot.say('#cywolf', c.bold('Please wait until you get the "Welcome to Cywolf" message before running commands.'));
 	    reset();
 	    return;
 	}
@@ -234,6 +236,7 @@ function lynch(killed) {
             endStr += name + ' was a ' + c.bold(proles[name]) + '. ';
         });
         bot.say('#cywolf', endStr);
+        bot.say('#cywolf', c.bold('Please wait until you get the "Welcome to Cywolf" message before running commands.'));
         reset();
         return;
     }
