@@ -56,6 +56,14 @@ bot.on('names#cywolf', function(newnames) {
 	reset();
     }
 });
+bot.on('nick', function(oldn, newn) {
+    if (players.indexOf(oldn) !== -1) {
+	players.push(newn);
+	players.splice(players.indexOf(oldn), 1);
+	proles[newn] = proles[oldn];
+	delete proles[oldn];
+    }
+});
 bot.on('part#cywolf', function(nick) {
     if (players.indexOf(nick) !== -1) {
 	bot.say('#cywolf', c.bold(nick) + ' didn\'t get out of bed for a long time and died. It appears he/she was a ' + c.bold(proles[nick]) + '.');
@@ -99,7 +107,7 @@ function day() {
     phase = 'day';
     firstnight = false;
     clearTimeout(timer);
-    bot.say('#cywolf', c.bold('☁') + ' It is now day. The villagers wake up and look around...');
+    bot.say('#cywolf', c.bold('☀') + ' It is now day. The villagers wake up and look around...');
     if (killed) {
 	bot.say('#cywolf', 'The corpse of ' + c.bold(killed) + ' is found. Upon searching his/her pockets, it was revealed that he/she was a ' + c.bold(proles[killed]) + '.');
 	players.splice(players.indexOf(killed), 1);
