@@ -6,6 +6,7 @@ var c = require('irc-colors');
 var winston = require('winston');
 var ready = false;
 var players = [];
+var rate = true;
 var phase = 'joins';
 var dead = [];
 var lynches = {};
@@ -53,6 +54,45 @@ bot.on('names#cywolf', function(newnames) {
     process.names = newnames;
     if (wreset) {
 	reset();
+    }
+});
+bot.on('part#cywolf', function(nick) {
+    if (players.indexOf(nick) !== -1) {
+	bot.say('#cywolf', c.bold(nick) + ' didn\'t get out of bed for a long time and died. It appears he/she was a ' + c.bold(proles[nick]) + '.');
+        players.splice(players.indexOf(killed), 1);
+        bot.send('MODE', '#cywolf', '-v', killed);
+        var wv = 0;
+        var vi = 0;
+        players.forEach(function(p) {
+            if (proles[p] == 'wolf') {
+                wv++;
+            }
+            else {
+                vi++;
+            }
+        });
+        if (wv >= vi || vi == 0 || wv == 0) {
+            if (wv >= vi) {
+                bot.say('#cywolf', 'The wolves, being the same number as the villagers, can now overpower everyone. They do so, and win.');
+            }
+            if (wv == 0) {
+                bot.say('#cywolf', 'All the wolves are now dead.');
+            }
+            if (vi == 0) {
+                bot.say('#cywolf', 'All the villagers are now dead.');
+            }
+            bot.say('#cywolf', c.bold('Game over!') + ' The ' + (wv == 0 ? c.bold.green('villagers') : c.bold.red('wolves')) + ' win!');
+            var endStr = '';
+            Object.keys(proles).forEach(function(name) {
+                if (proles[name] == 'villager') {
+                    return;
+                }
+                endStr += name + ' was a ' + c.bold(proles[name]) + '. ';
+            });
+            bot.say('#cywolf', endStr);
+            reset();
+            return;
+        }
     }
 });
 function day() {
@@ -330,9 +370,15 @@ bot.on('message', function(nick, to, text, raw) {
 	start();
     }
     if (text == '!ping') {
-	var rate = true;
-	if (process.names && true) {
+	if (process.names && rate) {
 	    bot.say('#cywolf', 'PING! ' + Object.keys(process.names).join(' '));
+	    rate = false;
+	    setTimeout(function() {
+		rate = true;
+	    }, 60000);
+	}
+	else {
+	    bot.notice(nick, 'This command is ratelimited.');
 	}
     }
     if (text == '!away') {
