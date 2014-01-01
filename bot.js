@@ -7,6 +7,7 @@ var winston = require('winston');
 var ready = false;
 var players = [];
 var timers = {};
+var lastmsgs = {};
 var express = require('express');
 var app = express();
 var http = require('http');
@@ -474,9 +475,7 @@ app.get('/', function(req, res) {
     res.render('index');
 });
 bot.on('message', function(nick, to, text, raw) {
-    if (timers[nick]) {
-	clearTimeout(timers[nick]);
-    }
+    lastmsgs[nick] = new Date().getTime() / 1000;
     winston.info('<' + nick + '> ' + text);
     if (to == '#cywolf') {
     if (nick == 'whiskers75' && text == '!shutdown') {
@@ -502,68 +501,6 @@ bot.on('message', function(nick, to, text, raw) {
     if (nick == 'whiskers75' && text == '!fstart') {
 	start();
     }
-	if (text.split(' ')[0] == '!idler' && phase != 'joins') {
-	    var idlor = '';
-            players.forEach(function(p) {
-                if (p.indexOf(idlor) !== -1) {
-			idlor = p;
-                }
-            });
-            if (players.indexOf(idlor) == -1) {
-                bot.notice(nick, 'That player does not exist.');
-                return;
-            }
-	    if (timers[idlor]) {
-		bot.notice(nick, 'That person has already been reported idle.');
-	    }
-	    bot.say('#cywolf', c.bold(idlor) + ' will idle out in ' + c.bold('1 minute') + ' unless they say something.');
-	    timers[idlor] = setTimeout(function() {
-		delete timers[idlor];
-		bot.say('#cywolf', c.bold(idlor) + ' didn\'t get out of bed for a very long time and died. It appears they were a ' + c.bold(proles[idlor]));
-                players.splice(players.indexOf(killed), 1);
-                if (phase !== 'joins') {
-                    if (killed == taken) {
-                        proles[process.doppelganger] = proles[killed];
-                        bot.say(process.doppelganger, 'You are now a ' + c.bold(proles[killed]) + '!');
-                        process[(proles[killed] == 'cursed villager' ? 'cursed' : proles[killed])] = process.doppelganger;
-                        process.doppelganger = '';
-                    }
-                    var wv = 0;
-                    var vi = 0;
-                    players.forEach(function(p) {
-                        if (proles[p] == 'wolf') {
-                            wv++;
-                        }
-                        else {
-                            vi++;
-                        }
-                    });
-                    if (wv >= vi || vi == 0 || wv == 0) {
-                        if (wv >= vi) {
-                            bot.say('#cywolf', 'The wolves, being the same number as the villagers, can now overpower everyone. They do so, and win.');
-                        }
-                        if (wv == 0) {
-                            bot.say('#cywolf', 'All the wolves are now dead.');
-                        }
-                        if (vi == 0) {
-                            bot.say('#cywolf', 'All the villagers are now dead.');
-                        }
-                        bot.say('#cywolf', c.bold('Game over!') + ' The ' + (wv == 0 ? c.bold.green('villagers') : c.bold.red('wolves')) + ' win!');
-                        var endStr = '';
-                        Object.keys(proles).forEach(function(name) {
-                            if (proles[name] == 'villager') {
-                                return;
-                            }
-                            endStr += name + ' was a ' + c.bold(proles[name]) + '. ';
-                        });
-                        bot.say('#cywolf', endStr);
-                        bot.say('#cywolf', c.bold('Please wait until you get the "Welcome to Cywolf" message before running commands.'));
-                        reset();
-                        return;
-                    }
-                }
-	    }, 60000);
-        }
     if (text == '!ping') {
         if (process.names && rate) {
             var pingarray = [];
@@ -672,6 +609,64 @@ bot.on('message', function(nick, to, text, raw) {
         }
     }
 });
+setInterval(function() {
+    if (phase !== 'joins') {
+    Object.keys(lastmsgs).forEach(function(nick) {
+	if (process.names.indexOf(nick) == -1) {
+	    return;
+	}
+	var secsidled = new Date().getTime() / 1000 - lastmsgs[nick];
+	if (secsidled > 75 && secsidled < 90) {
+	    bot.say('#cywolf', nick + ': ' + c.bold.red('You have been idling for a long time. Say something soon or you may be found dead.'));
+	}
+	if (secsidled > 130) {
+	    bot.say('#cywolf', c.bold(nick) + ' was mysteriously impaled. Upon further investigation, it was revealed that they were a ' + c.bold(proles[nick]));
+            players.splice(players.indexOf(nick), 1);
+            if (phase !== 'joins') {
+                if (nick == taken) {
+                    proles[process.doppelganger] = proles[nick];
+                    bot.say(process.doppelganger, 'You are now a ' + c.bold(proles[nick]) + '!');
+                    process[(proles[nick] == 'cursed villager' ? 'cursed' : proles[nick])] = process.doppelganger;
+                    process.doppelganger = '';
+                }
+                var wv = 0;
+                var vi = 0;
+                players.forEach(function(p) {
+                    if (proles[p] == 'wolf') {
+                        wv++;
+                    }
+                    else {
+                        vi++;
+                    }
+                });
+                if (wv >= vi || vi == 0 || wv == 0) {
+                    if (wv >= vi) {
+                        bot.say('#cywolf', 'The wolves, being the same number as the villagers, can now overpower everyone. They do so, and win.');
+                    }
+                    if (wv == 0) {
+                        bot.say('#cywolf', 'All the wolves are now dead.');
+                    }
+                    if (vi == 0) {
+                        bot.say('#cywolf', 'All the villagers are now dead.');
+                    }
+                    bot.say('#cywolf', c.bold('Game over!') + ' The ' + (wv == 0 ? c.bold.green('villagers') : c.bold.red('wolves')) + ' win!');
+                    var endStr = '';
+                    Object.keys(proles).forEach(function(name) {
+                        if (proles[name] == 'villager') {
+                            return;
+                        }
+                        endStr += name + ' was a ' + c.bold(proles[name]) + '. ';
+                    });
+                    bot.say('#cywolf', endStr);
+                    bot.say('#cywolf', c.bold('Please wait until you get the "Welcome to Cywolf" message before running commands.'));
+                    reset();
+                    return;
+                }
+            }
+        }
+    });
+	}
+}, 5000);
 bot.on('error', function(err) {
     console.log(JSON.stringify(err));
 });
