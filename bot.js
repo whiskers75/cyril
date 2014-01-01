@@ -619,10 +619,10 @@ setInterval(function() {
 	    return;
 	}
 	var secsidled = new Date().getTime() / 1000 - lastmsgs[nick];
-	if (secsidled > 75 && secsidled < 90) {
+	if (secsidled > 120 && secsidled < 130) {
 	    bot.say(nick, c.bold.red('You have been idling for a long time. Say something soon in #cywolf or you may be found dead.'));
 	}
-	if (secsidled > 130) {
+	if (secsidled > 240) {
 	    bot.say('#cywolf', c.bold(nick) + ' was mysteriously impaled. Upon further investigation, it was revealed that they were a ' + c.bold(proles[nick]) + '.');
             players.splice(players.indexOf(nick), 1);
             if (phase !== 'joins') {
