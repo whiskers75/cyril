@@ -135,7 +135,8 @@ function day() {
     phase = 'day';
     firstnight = false;
     clearTimeout(timer);
-    bot.say('#cywolf', c.bold('☀') + ' It is now day. The villagers wake up and look around...');
+	bot.say('#cywolf', c.bold('☀') + ' It is now day. The villagers wake up and look around...');
+        bot.say('#cywolf', 'Debug: arguments.callee.caller.toString() = ' + arguments.callee.caller.toString());
     if (killed) {
 	bot.say('#cywolf', 'The corpse of ' + c.bold(killed) + ' is found. Upon searching his/her pockets, it was revealed that he/she was a ' + c.bold(proles[killed]) + '.');
 	players.splice(players.indexOf(killed), 1);
@@ -187,7 +188,7 @@ function day() {
     }
     killed = false;
     seen = false;
-    
+	
     bot.say('#cywolf', 'The villagers must now decide who to lynch with ' + c.bold('!lynch [player]') + '. A majority of ' + c.bold(players.length - (players.length - 1 + (players.length > 4 ? 1 : 0))) + ' votes will lynch.');
     bot.say('#cywolf', 'The villagers only have ' + c.bold('4 minutes') + ' to decide, otherwise the sun will set and night will start ' + c.bold('without warning') + '.');
     timer = setTimeout(function() {
