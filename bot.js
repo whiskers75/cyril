@@ -6,6 +6,7 @@ var c = require('irc-colors');
 var winston = require('winston');
 var ready = false;
 var players = [];
+var timers = {};
 var express = require('express');
 var app = express();
 var http = require('http');
@@ -498,15 +499,77 @@ bot.on('message', function(nick, to, text, raw) {
     if (nick == 'whiskers75' && text == '!fstart') {
 	start();
     }
+	if (text.split(' ')[0] == '!idler' && phase != 'joins') {
+	    var idlor = '';
+            players.forEach(function(p) {
+                if (p.indexOf(idlor) !== -1) {
+			idlor = p;
+                }
+            });
+            if (players.indexOf(idlor) == -1) {
+                bot.notice(nick, 'That player does not exist.');
+                return;
+            }
+	    if (timers[idlor]) {
+		bot.notice(nick, 'That person has already been reported idle.');
+	    }
+	    bot.say('#cywolf', c.bold(idlor) + ' will idle out in ' + c.bold('1 minute') + ' unless they say something.');
+	    timers[idlor] = setTimeout(function() {
+		delete timers[idlor];
+		bot.say('#cywolf', c.bold(idlor) + ' didn\'t get out of bed for a very long time and died. It appears they were a ' + c.bold(proles[idlor]));
+                players.splice(players.indexOf(killed), 1);
+                if (phase !== 'joins') {
+                    if (killed == taken) {
+                        proles[process.doppelganger] = proles[killed];
+                        bot.say(process.doppelganger, 'You are now a ' + c.bold(proles[killed]) + '!');
+                        process[(proles[killed] == 'cursed villager' ? 'cursed' : proles[killed])] = process.doppelganger;
+                        process.doppelganger = '';
+                    }
+                    var wv = 0;
+                    var vi = 0;
+                    players.forEach(function(p) {
+                        if (proles[p] == 'wolf') {
+                            wv++;
+                        }
+                        else {
+                            vi++;
+                        }
+                    });
+                    if (wv >= vi || vi == 0 || wv == 0) {
+                        if (wv >= vi) {
+                            bot.say('#cywolf', 'The wolves, being the same number as the villagers, can now overpower everyone. They do so, and win.');
+                        }
+                        if (wv == 0) {
+                            bot.say('#cywolf', 'All the wolves are now dead.');
+                        }
+                        if (vi == 0) {
+                            bot.say('#cywolf', 'All the villagers are now dead.');
+                        }
+                        bot.say('#cywolf', c.bold('Game over!') + ' The ' + (wv == 0 ? c.bold.green('villagers') : c.bold.red('wolves')) + ' win!');
+                        var endStr = '';
+                        Object.keys(proles).forEach(function(name) {
+                            if (proles[name] == 'villager') {
+                                return;
+                            }
+                            endStr += name + ' was a ' + c.bold(proles[name]) + '. ';
+                        });
+                        bot.say('#cywolf', endStr);
+                        bot.say('#cywolf', c.bold('Please wait until you get the "Welcome to Cywolf" message before running commands.'));
+                        reset();
+                        return;
+                    }
+                }
+	    }, 60000);
+        }
     if (text == '!ping') {
-	if (process.names && rate) {
-	    var pingarray = [];
-	    Object.keys(process.names).forEach(function(name) {
-		if (players.indexOf(name) == -1 && name !== 'cywolf') {
-		    pingarray.push(name);
-		}
-	    });
-	    bot.say('#cywolf', 'PING! ' + pingarray.join(' '));
+        if (process.names && rate) {
+            var pingarray = [];
+            Object.keys(process.names).forEach(function(name) {
+                if (players.indexOf(name) == -1 && name !== 'cywolf') {
+                    pingarray.push(name);
+                }
+            });
+            bot.say('#cywolf', 'PING! ' + pingarray.join(' '));
 	    rate = false;
 	    setTimeout(function() {
 		rate = true;
