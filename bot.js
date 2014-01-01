@@ -612,7 +612,7 @@ bot.on('message', function(nick, to, text, raw) {
 setInterval(function() {
     if (phase !== 'joins') {
     Object.keys(lastmsgs).forEach(function(nick) {
-	if (process.names.indexOf(nick) == -1) {
+	if (Object.keys(process.names).indexOf(nick) == -1) {
 	    return;
 	}
 	var secsidled = new Date().getTime() / 1000 - lastmsgs[nick];
