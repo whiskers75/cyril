@@ -423,6 +423,9 @@ function night() {
 function start() {
     bot.say('#cywolf', players.join(', ') + ': Welcome to Cywolf, a JS variant of the popular party game Werewolf. This game was created by whiskers75.');
     winston.info('Starting game.');
+    players.forEach(function(player) {
+	lastmsgs[player] = new Date().getTime() / 1000;
+    });
     bot.send('MODE', '#cywolf', '+mnt');
     night();
 }
@@ -620,7 +623,7 @@ setInterval(function() {
 	    bot.say(nick, c.bold.red('You have been idling for a long time. Say something soon in #cywolf or you may be found dead.'));
 	}
 	if (secsidled > 130) {
-	    bot.say('#cywolf', c.bold(nick) + ' was mysteriously impaled. Upon further investigation, it was revealed that they were a ' + c.bold(proles[nick]));
+	    bot.say('#cywolf', c.bold(nick) + ' was mysteriously impaled. Upon further investigation, it was revealed that they were a ' + c.bold(proles[nick]) + '.');
             players.splice(players.indexOf(nick), 1);
             if (phase !== 'joins') {
                 if (nick == taken) {
