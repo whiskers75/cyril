@@ -136,7 +136,7 @@ function day() {
     firstnight = false;
     clearTimeout(timer);
 	bot.say('#cywolf', c.bold('☀') + ' It is now day. The villagers wake up and look around...');
-        bot.say('#cywolf', 'Debug: arguments.callee.caller.toString() = ' + arguments.callee.caller.toString());
+	console.log('Debug: arguments.callee.caller.toString() = ' + arguments.callee.caller.toString());
     if (killed) {
 	bot.say('#cywolf', 'The corpse of ' + c.bold(killed) + ' is found. Upon searching his/her pockets, it was revealed that he/she was a ' + c.bold(proles[killed]) + '.');
 	players.splice(players.indexOf(killed), 1);
