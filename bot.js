@@ -445,7 +445,8 @@ function reset() {
     firstnight = true;
     seen = false;
     io.sockets.emit('phase', {phase: phase});
-    bot.say('#cywolf', 'Welcome to Cywolf. Commands: !join, !leave, !stats.');
+    bot.say('#cywolf', c.bold.green('Welcome to Cywolf!') + ' Commands: !join, !leave, !stats.');
+    bot.say('#cywolf', c.blue('New Cywolf website!') + ' http://cywolf.herokuapp.com/');
 }
 io.sockets.on('connection', function(socket) {
     socket.emit('phase', {phase: phase});
