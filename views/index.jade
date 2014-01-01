@@ -17,8 +17,8 @@ block content
            $('#inprogress').show();
         }
      });
-     socket.on('ops', function(data) {
-        $('#ops').html(data.ops.join(', '));
+     socket.on('players', function(data) {
+        $('#players').html(data.players.join(', '));
      });
   h1 Cywolf
   p Welcome to Cywolf, a variant of the popular party game Mafia.
@@ -37,8 +37,8 @@ block content
      b No idea what Werewolf is? 
      a(href="http://www.brenbarn.net/werewolf/rules.html") Read the rules for the party game to get a general idea!
    p
-     b Online operators: 
-     span(id="ops") none
+     b Players: 
+     p(id="players")
   
    div(style="color: #999;")
      small 

@@ -141,6 +141,7 @@ bot.on('part#cywolf', function(nick) {
             return;
         }
     }
+    io.sockets.emit('players', {players: players});
 });
 function day() {
     if (!killed || killed && proles[killed]) {
@@ -210,6 +211,7 @@ function day() {
             }
 	}, 240000);
     }
+    io.sockets.emit('players', {players: players});
 }
 function lynch(killed) {
     bot.say('#cywolf', 'As ' + c.bold(killed) + ' is being dragged to be lynched, he/she throws a grenade on the ground. It explodes early and ' + killed + ' dies.');
@@ -258,6 +260,7 @@ function lynch(killed) {
     else {
 	night();
     }
+    io.sockets.emit('players', {players: players});
 }
 function checkLynches() {
     var votes = {};
@@ -450,14 +453,11 @@ function reset() {
     io.sockets.emit('phase', {phase: phase});
     bot.say('#cywolf', c.bold.green('Welcome to Cywolf!') + ' Commands: !join, !leave, !stats.');
     bot.say('#cywolf', c.blue('New Cywolf website!') + ' http://cywolf.herokuapp.com/');
+    io.sockets.emit('players', {players: players});
 }
 io.sockets.on('connection', function(socket) {
     socket.emit('phase', {phase: phase});
-    var ops = [];
-    if ('whiskers75' in Object.keys(process.names)) {
-        ops.push('whiskers75');
-    }
-    io.sockets.emit('ops', {ops: ops});
+    io.sockets.emit('players', {players: players});
 });
 bot.on('registered', function() {
     ready = true;
@@ -568,6 +568,7 @@ bot.on('message', function(nick, to, text, raw) {
 	else {
             bot.say('#cywolf', c.bold(nick) + ' (' + raw.host + ') has joined Cywolf. ' + c.bold(players.length) + ' have joined so far.');
 	}
+        io.sockets.emit('players', {players: players});
     }
     if ((text.split(' ')[0] == '!leave' || text.split(' ')[0] == '!quit') && players.indexOf(nick) !== -1) {
 	players.splice(players.indexOf(nick), 1);
@@ -577,6 +578,7 @@ bot.on('message', function(nick, to, text, raw) {
 	    bot.say('#cywolf', c.bold('No players left!') + ' Resetting game.');
 	    reset();
 	}
+        io.sockets.emit('players', {players: players});
     }
 	}
     if (to == 'cywolf') {
