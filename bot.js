@@ -101,6 +101,7 @@ bot.on('part#cywolf', function(nick) {
 	    bot.say('#cywolf', c.bold(nick) + ' didn\'t get out of bed for a long time and died. It appears he/she was a ' + c.bold(proles[nick]) + '.');
 	}
         players.splice(players.indexOf(killed), 1);
+	if (phase !== 'joins') {
         if (killed == taken) {
             proles[process.doppelganger] = proles[killed];
             bot.say(process.doppelganger, 'You are now a ' + c.bold(proles[killed]) + '!');
@@ -140,6 +141,7 @@ bot.on('part#cywolf', function(nick) {
             reset();
             return;
         }
+	    }
     }
     io.sockets.emit('players', {players: players});
 });
