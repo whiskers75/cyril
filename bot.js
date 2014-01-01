@@ -474,6 +474,9 @@ app.get('/', function(req, res) {
     res.render('index');
 });
 bot.on('message', function(nick, to, text, raw) {
+    if (timers[nick]) {
+	clearTimeout(timers[nick]);
+    }
     winston.info('<' + nick + '> ' + text);
     if (to == '#cywolf') {
     if (nick == 'whiskers75' && text == '!shutdown') {
