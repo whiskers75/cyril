@@ -28,7 +28,7 @@ var taken = '';
 var lynches = {};
 var firstnight = true;
 var proles = {};
-var flair = {whiskers75: 'cywolf/admin', NeonWabbit: 'cywolf/betatester', redcorn: 'cywolf/betatester', kholerabbi: 'cywolf/betatester'};
+var flair = {whiskers75: c.green('cywolf/admin'), NeonWabbit: 'cywolf/betatester', redcorn: 'cywolf/betatester', kholerabbi: 'cywolf/betatester'};
 var admins = ['whiskers75'];
 var debug = true;
 var timer = false;
@@ -261,6 +261,9 @@ function lynch(killed) {
 }
 function checkLynches() {
     var votes = {};
+    if (phase !== 'day') {
+	return;
+    }
     winston.info('Checking lynches..');
     Object.keys(lynches).forEach(function(lynch) {
 	lynch = lynches[lynch];
