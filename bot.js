@@ -612,12 +612,12 @@ bot.on('message', function(nick, to, text, raw) {
 setInterval(function() {
     if (phase !== 'joins') {
     Object.keys(lastmsgs).forEach(function(nick) {
-	if (Object.keys(process.names).indexOf(nick) == -1) {
+	if (Object.keys(process.names).indexOf(nick) == -1 || players.indexOf(nick) == -1) {
 	    return;
 	}
 	var secsidled = new Date().getTime() / 1000 - lastmsgs[nick];
 	if (secsidled > 75 && secsidled < 90) {
-	    bot.say('#cywolf', nick + ': ' + c.bold.red('You have been idling for a long time. Say something soon or you may be found dead.'));
+	    bot.say(nick, c.bold.red('You have been idling for a long time. Say something soon in #cywolf or you may be found dead.'));
 	}
 	if (secsidled > 130) {
 	    bot.say('#cywolf', c.bold(nick) + ' was mysteriously impaled. Upon further investigation, it was revealed that they were a ' + c.bold(proles[nick]));
