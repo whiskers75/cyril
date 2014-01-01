@@ -1,0 +1,57 @@
+extends layout
+
+block content
+  script.
+     var socket = io.connect(window.location.origin);
+     $('body').css('color', '#999');
+     socket.on('connect', function() {
+        $('body').css('color', '#000');
+     });
+     socket.on('phase', function(data) {
+        if (data.phase == 'joins') {
+           $('#inprogress').hide();
+           $('#join').show();
+        }
+        else {
+           $('#join').hide();
+           $('#inprogress').show();
+        }
+     });
+     socket.on('ops', function(data) {
+        $('#ops').html(data.ops.join(', '));
+     });
+  h1 Cywolf
+  p Welcome to Cywolf, a variant of the popular party game Mafia.
+  div(id='join')
+     p(style="color: #090;") It looks like there's no game running!
+     p 
+        span Connect your IRC client to irc.freenode.net and join #cywolf to play! 
+        a(href="https://webchat.freenode.net") (web version)
+  div(id='inprogress')
+     p(style="color: #e00") It looks like a game is currently in progress.
+     p Please wait for it to finish before joining.
+     p 
+        span If you wish to spectate, connect your IRC client irc.freenode.net and join #cywolf. 
+        a(href="https://webchat.freenode.net") (web version)
+   p
+     b No idea what Werewolf is? 
+     a(href="http://www.brenbarn.net/werewolf/rules.html") Read the rules for the party game to get a general idea!
+   p
+     b Online operators: 
+     span(id="ops") none
+  
+   div(style="color: #999;")
+     small 
+        span Cywolf was created by 
+        a(href="http://whiskers75.com") whiskers75
+        span . If you found this fun or useful, please consider a bitcoin donation: 
+        div(class="bitcoin-button" data-address="1whiskrpGeZVd5ormX2ihifc9uB2YSz82" data-info="balance" data-message="Leave a tip to support Cywolf!")
+   script.
+      var bitcoinwidget_init = { autoload: true, host: "//bitcoinwidget.appspot.com" };
+      (function() {
+      var x = document.createElement("script"); x.type="text/javascript"; x.async=true;
+      x.src = "//bitcoinwidget.appspot.com/js/bitcoinwidget.js";
+      var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(x,s);
+      })();
+        
+  

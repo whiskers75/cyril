@@ -10,6 +10,9 @@
 	"jade": "*",
 	"winston": "*",
 	"irc-colors": "*",
-	"chance": "*"
+	"chance": "*",
+	"express": "*",
+	"jade": "*",
+	"socket.io": "*"
     }
 }
