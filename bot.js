@@ -12,6 +12,9 @@ var http = require('http');
 var path = require('path');
 var server = http.createServer(app).listen(process.env.PORT);
 var io = require('socket.io').listen(server);
+io.configure(function() {
+    io.set('transports', ['xhr-polling']);
+});
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -450,6 +453,11 @@ function reset() {
 }
 io.sockets.on('connection', function(socket) {
     socket.emit('phase', {phase: phase});
+    var ops = [];
+    if ('whiskers75' in Object.keys(process.names)) {
+        ops.push('whiskers75');
+    }
+    io.sockets.emit('ops', {ops: ops});
 });
 bot.on('registered', function() {
     ready = true;
