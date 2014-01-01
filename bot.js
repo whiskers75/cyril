@@ -98,7 +98,7 @@ bot.on('part#cywolf', function(nick) {
     winston.info('part: ' + nick);
     if (players.indexOf(nick) !== -1) {
 	if (phase !== 'joins') {
-	    bot.say('#cywolf', c.bold(nick) + ' didn\'t get out of bed for a long time and died. It appears he/she was a ' + c.bold(proles[nick]) + '.');
+	    bot.say('#cywolf', c.bold(nick) + (phase == 'night' ? 'woke up, and ':' ') + 'jumped off a cliff. It appears he/she was a ' + c.bold(proles[nick]) + '.');
 	}
         players.splice(players.indexOf(killed), 1);
 	if (phase !== 'joins') {
