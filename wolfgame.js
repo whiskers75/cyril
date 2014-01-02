@@ -25,6 +25,7 @@ var Wolfgame = function() {
 	    else {
 		vills++;
 	    }
+	});
 	    if (wolves >= vills || vills == 0) {
 		process.game.emit('message', {message: process.game.c.bold('Game over!') + ' The wolves have enough to outnumber the villagers. They do so and win.'});
 		process.game.emit('message', {message: process.game.c.bold.red('The wolves win!')});
@@ -40,7 +41,6 @@ var Wolfgame = function() {
 		return true;
 	    }
 	    return false;
-	});
     };
     this.kill = function(player, reason) {
 	this.emit('message', {message: this.c.bold(player) + (reason ? reason : ' was mauled by werewolves and died.') + ' It appears that they were a ' + this.c.bold(this.players[player]) + '.'});
