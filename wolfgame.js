@@ -26,31 +26,31 @@ var Wolfgame = function() {
 		vills++;
 	    }
 	});
-	    if (wolves >= vills || vills == 0) {
-		process.game.emit('message', {message: process.game.c.bold('Game over!') + ' The wolves have enough to outnumber the villagers. They do so and win.'});
-		process.game.emit('message', {message: process.game.c.bold.red('The wolves win!')});
-		_k(process.game.players).forEach(function(player) {
-		    if (process.game.players[player].toString() !== 'villager') {
-			process.game.emit('message', {message: process.game.c.bold(player) + ' was a ' + process.game.c.bold(process.game.players[player].toString()) + '.'});
-		    }
-		});
-		process.game.emit('gameover');
-		process.game.over = true;
-		return true;
-	    }
-	    if (wolves == 0) {
-		process.game.emit('message', {message: process.game.c.bold('Game over!') + ' All the wolves are dead! The villagers chop them up, BBQ them and have a hearty meal.'});
-		process.game.emit('message', {message: process.game.c.bold.green('The villagers win!')});
-                _k(process.game.players).forEach(function(player) {
-                    if (process.game.players[player].toString() !== 'villager') {
-                        process.game.emit('message', {message: process.game.c.bold(player) + ' was a ' + process.game.c.bold(process.game.players[player].toString()) + '.'});
-                    }
-                });
-		process.game.emit('gameover');
-		process.game.over = true;
-		return true;
-	    }
-	    return false;
+	if (wolves >= vills || vills == 0) {
+	    process.game.emit('message', {message: process.game.c.bold('Game over!') + ' The wolves have enough to outnumber the villagers. They do so and win.'});
+	    process.game.emit('message', {message: process.game.c.bold.red('The wolves win!')});
+	    _k(process.game.players).forEach(function(player) {
+		if (process.game.players[player].toString() !== 'villager') {
+		    process.game.emit('message', {message: process.game.c.bold(player) + ' was a ' + process.game.c.bold(process.game.players[player].toString()) + '.'});
+		}
+	    });
+	    process.game.emit('gameover');
+	    process.game.over = true;
+	    return true;
+	}
+	if (wolves == 0) {
+	    process.game.emit('message', {message: process.game.c.bold('Game over!') + ' All the wolves are dead! The villagers chop them up, BBQ them and have a hearty meal.'});
+	    process.game.emit('message', {message: process.game.c.bold.green('The villagers win!')});
+            _k(process.game.players).forEach(function(player) {
+                if (process.game.players[player].toString() !== 'villager') {
+                    process.game.emit('message', {message: process.game.c.bold(player) + ' was a ' + process.game.c.bold(process.game.players[player].toString()) + '.'});
+                }
+            });
+	    process.game.emit('gameover');
+	    process.game.over = true;
+	    return true;
+	}
+	return false;
     };
     this.kill = function(player, reason) {
 	this.emit('message', {message: this.c.bold(player) + (reason ? reason : ' was mauled by werewolves and died.') + ' It appears that they were a ' + this.c.bold(this.players[player]) + '.'});
@@ -89,7 +89,7 @@ var Wolfgame = function() {
         });
         Object.keys(votes).forEach(function(vote) {
             var voted = votes[vote];
-            if (voted >= (_k(process.game.players).length - 1 + (_k(process.game.players).length > 4 ? 1 : 0))) {
+            if (voted >= (_k(process.game.players).length - 2)) {
 		if (!process.game.kill(vote, ' was lynched by the angry mob of villagers.')) {
 		    process.game.emit('night');
 		}

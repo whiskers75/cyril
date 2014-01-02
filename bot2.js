@@ -20,29 +20,29 @@ String.prototype.repeat = function( num ) {
 function reset() {
     winston.info('Cywolf 2 reset!');
     bot.mode('#cywolf', '-m');
-	var game = new Wolfgame();
-	bot.send('#cywolf', 'Welcome to Cywolf 2. Start a game with !join.');
+    var game = new Wolfgame();
+    bot.send('#cywolf', 'Welcome to Cywolf 2. Start a game with !join.');
     game.on('joined', function(data) {
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
     });
     game.on('quitted', function(data) {
         bot.send('#cywolf', c.bold(data.player) + ' quit Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
     });
-	game.on('lynch', function(data) {
-	    bot.send('#cywolf', c.bold(data.from) + ' votes for ' + c.bold(data.to) + '.');
-	});
+    game.on('lynch', function(data) {
+	bot.send('#cywolf', c.bold(data.from) + ' votes for ' + c.bold(data.to) + '.');
+    });
     game.on('notice', function(data) {
 	bot.notice(data.to, data.message);
     });
     game.on('message', function(data) {
 	bot.send('#cywolf', data.message);
     });
-	game.on('gameover', function() {
-	    _k(game.players).forEach(function(player) {
-		bot.mode('#cywolf', '-v', player);
-	    });
-	    reset();
+    game.on('gameover', function() {
+	_k(game.players).forEach(function(player) {
+	    bot.mode('#cywolf', '-v', player);
 	});
+	reset();
+    });
     game.on('pm', function(data) {
 	bot.send(data.to, data.message);
     });
@@ -50,28 +50,28 @@ function reset() {
         bot.send('#cywolf', _k(game.players).join(', ') + ': Welcome to Cywolf ' + game.c.bold('2.0') + ', the next generation of the game Wolfgame (or Mafia).');
 	bot.mode('#cywolf', '+m');
     });
-	bot.on('part', function(data) {
-	    if (_k(game.players).indexOf(data.nick) !== -1) {
-		if (game.phase !== 'joins') {
-		    game.kill(data.nick, ' left the village, and died.');
-		}
-		else {
-		    game.emit('quit', {player: data.nick});
-		}
+    bot.on('part', function(data) {
+	if (_k(game.players).indexOf(data.nick) !== -1) {
+	    if (game.phase !== 'joins') {
+		game.kill(data.nick, ' left the village, and died.');
 	    }
-	});
-	bot.on('nick', function(data) {
-	    if (_k(game.players).indexOf(data.nick) !== -1) {
-		game.players[data.new] = game.players[data.nick];
-		delete game.players[data.nick];
+	    else {
+		game.emit('quit', {player: data.nick});
 	    }
-	});
+	}
+    });
+    bot.on('nick', function(data) {
+	if (_k(game.players).indexOf(data.nick) !== -1) {
+	    game.players[data.new] = game.players[data.nick];
+	    delete game.players[data.nick];
+	}
+    });
     game.on('day', function() {
 	setTimeout(function() {
-	if (!game.over) {
-            bot.send('#cywolf', c.bold('☀') + ' It is now day.');
-	    bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
-	}
+	    if (!game.over) {
+		bot.send('#cywolf', c.bold('☀') + ' It is now day.');
+		bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
+	    }
 	}, 1000);
     });
     game.on('death', function(data) {
@@ -145,7 +145,7 @@ function reset() {
 	    }
 	}
 	if (game.phase == 'day') {
-	    if (data.cmd == '!lynch' || data.cmd == 'vote') {
+	    if (data.cmd == '!lynch' || data.cmd == '!vote') {
 		game.lynch(data.args[1], data.from);
 	    }
 	}
