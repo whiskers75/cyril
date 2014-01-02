@@ -81,7 +81,7 @@ var Wolfgame = function() {
             return;
         }
         _k(this.lynches).forEach(function(lynch) {
-            lynch = this.lynches[lynch];
+            lynch = process.game.lynches[lynch];
             if (!votes[lynch]) {
                 votes[lynch] = 0;
             }
@@ -185,6 +185,12 @@ var Wolfgame = function() {
 	if (this.killing) {
 	    this.kill(this.killing, ' was mauled by wolves and died.');
 	}
+	_k(this.players).forEach(function(p) {
+	    p = process.game.players[p];
+	    if (p.canAct) {
+		p.acted = false;
+	    }
+	});
     });
 };
 util.inherits(Wolfgame, EventEmitter);

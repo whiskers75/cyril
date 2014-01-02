@@ -19,25 +19,30 @@ String.prototype.repeat = function( num ) {
 };
 function reset() {
     winston.info('Cywolf 2 reset!');
-    setTimeout(function() {
-	bot.mode('#cywolf', '-m');
+    bot.mode('#cywolf', '-m');
 	var game = new Wolfgame();
+	bot.send('#cywolf', 'Welcome to Cywolf 2. Start a game with !join.');
     game.on('joined', function(data) {
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
     });
     game.on('quitted', function(data) {
         bot.send('#cywolf', c.bold(data.player) + ' quit Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
     });
+	game.on('lynch', function(data) {
+	    bot.send('#cywolf', c.bold(data.from) + ' votes for ' + c.bold(data.to) + '.');
+	});
     game.on('notice', function(data) {
 	bot.notice(data.to, data.message);
     });
     game.on('message', function(data) {
 	bot.send('#cywolf', data.message);
     });
-    game.on('gameover', function() {
-        bot.mode('#cywolf', '-' + 'v'.repeat(_k(game.players).length), _k(game.players).join(' '));
-	reset();
-    });
+	game.on('gameover', function() {
+	    _k(game.players).forEach(function(player) {
+		bot.mode('#cywolf', '-v', player);
+	    });
+	    reset();
+	});
     game.on('pm', function(data) {
 	bot.send(data.to, data.message);
     });
@@ -45,6 +50,22 @@ function reset() {
         bot.send('#cywolf', _k(game.players).join(', ') + ': Welcome to Cywolf ' + game.c.bold('2.0') + ', the next generation of the game Wolfgame (or Mafia).');
 	bot.mode('#cywolf', '+m');
     });
+	bot.on('part', function(data) {
+	    if (_k(game.players).indexOf(data.nick) !== -1) {
+		if (game.phase !== 'joins') {
+		    game.kill(data.nick, ' left the village, and died.');
+		}
+		else {
+		    game.emit('quit', {player: data.nick});
+		}
+	    }
+	});
+	bot.on('nick', function(data) {
+	    if (_k(game.players).indexOf(data.nick) !== -1) {
+		game.players[data.new] = game.players[data.nick];
+		delete game.players[data.nick];
+	    }
+	});
     game.on('day', function() {
 	setTimeout(function() {
 	if (!game.over) {
@@ -53,8 +74,8 @@ function reset() {
 	}
 	}, 1000);
     });
-    game.on('death', function(name, reason) {
-	bot.mode('#cywolf', '-v', name);
+    game.on('death', function(data) {
+	bot.mode('#cywolf', '-v', data.name);
     });
     game.on('night', function() {
 	_k(game.players).forEach(function(player) {
@@ -83,6 +104,12 @@ function reset() {
 	    if (data.cmd == '!quit' || data.cmd == '!leave') {
                 bot.mode('#cywolf', '-v', data.from);
 		game.emit('quit', {player: data.from.toString()});
+	    }
+	    if (data.cmd == '!away') {
+		if (_k(game.players).indexOf(data.from) !== -1) {
+		    game.emit('quit', {player: data.from.toString()});
+		}
+		bot.kick('#cywolf', data.from, 'You go be away somewhere else, or use /away next time.');
 	    }
 	    if (data.cmd == '!stats') {
 		bot.send('#cywolf', 'Players: ' + _k(game.players).join(' '));
@@ -123,13 +150,11 @@ function reset() {
 	    }
 	}
     });
-	});
 }
 bot.on('join', function(data) {
     if (data.nick != 'cywolf2') {
 	return;
     }
-    bot.send('#cywolf', c.bold('Cywolf 2 connected!') + ' Start a game with !join.');
     reset();
 });
 
