@@ -92,6 +92,11 @@ function reset() {
 	    if (data.cmd == '!stats') {
 		bot.send('#cywolf', 'Players: ' + _k(game.players).join(' '));
 	    }
+	    if (data.cmd == '!ping' && data.from == 'whiskers75') {
+		bot.names('#cywolf', function(er, names) {
+		    bot.send('#cywolf', 'PING (by operator)! ' + names.join(' '));
+		});
+	    }
 	    if (data.cmd == '!start') {
 		if (_k(game.players).length >= 4 || data.from == 'whiskers75') {
 		    game.emit('start');
