@@ -29,6 +29,11 @@ var Wolfgame = function() {
 	    if (wolves >= vills || vills == 0) {
 		process.game.emit('message', {message: process.game.c.bold('Game over!') + ' The wolves have enough to outnumber the villagers. They do so and win.'});
 		process.game.emit('message', {message: process.game.c.bold.red('The wolves win!')});
+		_k(process.game.players).forEach(function(player) {
+		    if (process.game.players[player].toString() !== 'villager') {
+			process.game.emit('message', {message: process.game.c.bold(player) + ' was a ' + process.game.c.bold(process.game.players[player].toString()) + '.'});
+		    }
+		});
 		process.game.emit('gameover');
 		process.game.over = true;
 		return true;
@@ -36,6 +41,11 @@ var Wolfgame = function() {
 	    if (wolves == 0) {
 		process.game.emit('message', {message: process.game.c.bold('Game over!') + ' All the wolves are dead! The villagers chop them up, BBQ them and have a hearty meal.'});
 		process.game.emit('message', {message: process.game.c.bold.green('The villagers win!')});
+                _k(process.game.players).forEach(function(player) {
+                    if (process.game.players[player].toString() !== 'villager') {
+                        process.game.emit('message', {message: process.game.c.bold(player) + ' was a ' + process.game.c.bold(process.game.players[player].toString()) + '.'});
+                    }
+                });
 		process.game.emit('gameover');
 		process.game.over = true;
 		return true;

@@ -18,16 +18,10 @@ String.prototype.repeat = function( num ) {
     return new Array( num + 1 ).join( this );
 };
 function reset() {
-    winston.info('Cywolf 2 connected!');
+    winston.info('Cywolf 2 reset!');
     setTimeout(function() {
-    bot.mode('#cywolf', '-m');
-    bot.names('#cywolf', function(err, names) {
-	bot.mode('#cywolf', '-' + 'v'.repeat(names.length), names.join(' '));
-    });
-    }, 1000);
-    bot.send('#cywolf', c.bold.green('Cywolf 2 started!'));
-    bot.topic('#cywolf', 'Cywolf 2.0 | Roles: seer, wolf [API implemented, more coming soon!] | Cywolf 2.0 is still in alpha! | <whiskers75> Don\'t break it too badly ;P');
-    var game = new Wolfgame();
+	bot.mode('#cywolf', '-m');
+	var game = new Wolfgame();
     game.on('joined', function(data) {
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
     });
@@ -41,6 +35,7 @@ function reset() {
 	bot.send('#cywolf', data.message);
     });
     game.on('gameover', function() {
+        bot.mode('#cywolf', '-' + 'v'.repeat(_k(game.players).length), _k(game.players).join(' '));
 	reset();
     });
     game.on('pm', function(data) {
@@ -128,11 +123,13 @@ function reset() {
 	    }
 	}
     });
+	});
 }
 bot.on('join', function(data) {
     if (data.nick != 'cywolf2') {
 	return;
     }
+    bot.say('#cywolf', c.bold('Cywolf 2 connected!') + ' Start a game with !join.');
     reset();
 });
 
