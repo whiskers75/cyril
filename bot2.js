@@ -24,6 +24,7 @@ function reset() {
 	bot.mode('#cywolf', '-' + 'v'.repeat(names.length), names.join(' '));
     });
     bot.send('#cywolf', c.bold.green('Cywolf 2 started!'));
+    bot.topic('#cywolf', 'Cywolf 2.0 | Roles: seer, wolf [API implemented, more coming soon!] | Cywolf 2.0 is still in beta ;P | <whiskers75> Don\'t break it too badly ;P');
     var game = new Wolfgame();
     game.on('joined', function(data) {
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
