@@ -1,11 +1,13 @@
 // Wolfgame module!
 var _k = Object.keys;
 var util = require('util');
+var chance = require('chance');
 var EventEmitter = require('events').EventEmitter;
 var Wolfgame = function() {
     this.players = {};
     this.phase = 'start';
     this.lynches = {};
+    this.chance = chance();
     this.over = false;
     this.c = require('irc-colors');
     /* Roles */
@@ -95,7 +97,7 @@ var Wolfgame = function() {
 	}
     };
     this.randomPlayer = function() {
-        return _k(this.players)[Math.floor(Math.random()*_k(this.players).length)];
+        return _k(this.players)[this.chance.integer({min: 0, max: _k(this.players).length - 1})];
     };
     this.allocate = function() {
 	// Allocate the roles

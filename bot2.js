@@ -21,9 +21,7 @@ function reset() {
     winston.info('Cywolf 2 connected!');
     bot.mode('#cywolf', '-m');
     bot.names('#cywolf', function(err, names) {
-	names.forEach(function(name) {
-	    bot.mode('#cywolf', '-v', name);
-	});
+	bot.mode('#cywolf', '-' + 'v'.repeat(names.length), names.join(' '));
     });
     bot.send('#cywolf', c.bold.green('Cywolf 2 started!'));
     var game = new Wolfgame();
@@ -32,9 +30,6 @@ function reset() {
     });
     game.on('quitted', function(data) {
         bot.send('#cywolf', c.bold(data.player) + ' quit Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
-        if (_k(game.players).length == 0) {
-	    reset();
-	}
     });
     game.on('notice', function(data) {
 	bot.notice(data.to, data.message);
@@ -87,7 +82,7 @@ function reset() {
 		bot.mode('#cywolf', '+v', data.from);
 		game.emit('join', {player: data.from.toString()});
 	    }
-	    if (data.cmd == '!quit') {
+	    if (data.cmd == '!quit' || data.cmd == '!leave') {
                 bot.mode('#cywolf', '-v', data.from);
 		game.emit('quit', {player: data.from.toString()});
 	    }
