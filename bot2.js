@@ -122,5 +122,10 @@ function reset() {
 	}
     });
 }
-bot.on('join', reset);
+bot.on('join', function(data) {
+    if (data.nick != 'cywolf2') {
+	return;
+    }
+    reset();
+});
 
