@@ -129,7 +129,7 @@ bot.on('join', function(data) {
     if (data.nick != 'cywolf2') {
 	return;
     }
-    bot.say('#cywolf', c.bold('Cywolf 2 connected!') + ' Start a game with !join.');
+    bot.send('#cywolf', c.bold('Cywolf 2 connected!') + ' Start a game with !join.');
     reset();
 });
 
