@@ -19,12 +19,14 @@ String.prototype.repeat = function( num ) {
 };
 function reset() {
     winston.info('Cywolf 2 connected!');
+    setTimeout(function() {
     bot.mode('#cywolf', '-m');
     bot.names('#cywolf', function(err, names) {
 	bot.mode('#cywolf', '-' + 'v'.repeat(names.length), names.join(' '));
     });
+    }, 1000);
     bot.send('#cywolf', c.bold.green('Cywolf 2 started!'));
-    bot.topic('#cywolf', 'Cywolf 2.0 | Roles: seer, wolf [API implemented, more coming soon!] | Cywolf 2.0 is still in beta ;P | <whiskers75> Don\'t break it too badly ;P');
+    bot.topic('#cywolf', 'Cywolf 2.0 | Roles: seer, wolf [API implemented, more coming soon!] | Cywolf 2.0 is still in alpha! | <whiskers75> Don\'t break it too badly ;P');
     var game = new Wolfgame();
     game.on('joined', function(data) {
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
@@ -51,8 +53,8 @@ function reset() {
     game.on('day', function() {
 	setTimeout(function() {
 	if (!game.over) {
-	    bot.send('#cywolf', 'It is now day.');
-	    bot.send('#cywolf', 'The villagers must now decide who to lynch. Use !lynch [player] to do so.');
+            bot.send('#cywolf', c.bold('☀') + ' It is now day.');
+	    bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
 	}
 	}, 1000);
     });
@@ -70,7 +72,7 @@ function reset() {
 		bot.send(player.name, 'PM me "act [player]" to act on that player (see your description).');
 	    }
 	});
-	bot.send('#cywolf', 'It is now night. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until day.');
+        bot.send('#cywolf', c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).');
     });
     bot.on('message', function(data) {
 	data.cmd = data.message.split(' ')[0];
@@ -100,7 +102,7 @@ function reset() {
 	    }
 	}
 	if (game.phase == 'night' && data.to == 'cywolf2') {
-	    if (data.cmd == 'act') {
+	    if (data.cmd == 'act' || data.cmd == 'see' || data.cmd == 'kill') {
 		if (game.players[data.from].canAct && !game.players[data.from].acted) {
 		    game.players[data.from].act(data.args[1]);
 		    var done = true;
@@ -116,7 +118,7 @@ function reset() {
 	    }
 	}
 	if (game.phase == 'day') {
-	    if (data.cmd == '!lynch') {
+	    if (data.cmd == '!lynch' || data.cmd == 'vote') {
 		game.lynch(data.args[1], data.from);
 	    }
 	}

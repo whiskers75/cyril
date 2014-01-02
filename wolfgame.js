@@ -79,21 +79,21 @@ var Wolfgame = function() {
         });
         Object.keys(votes).forEach(function(vote) {
             var voted = votes[vote];
-            if (voted >= (_k(this.players).length - 1 + (_k(this.players).length > 4 ? 1 : 0))) {
-		if (!this.kill(vote, ' was lynched by the angry mob of villagers.')) {
-		    this.emit('night');
+            if (voted >= (_k(process.game.players).length - 1 + (_k(process.game.players).length > 4 ? 1 : 0))) {
+		if (!process.game.kill(vote, ' was lynched by the angry mob of villagers.')) {
+		    process.game.emit('night');
 		}
 		return;
             }
 	});
     };
     this.lynch = function(player, lynchee) {
-	if (this.autocomplete(player) && this.autocomplete(lynchee)) {
-	    lynchee = this.autocomplete(lynchee);
-	    player = this.autocomplete(player);
-	    this.lynches[lynchee] = player;
-	    this.emit('lynch', {from: lynchee, to: player});
-	    this.checkLynches();
+	if (process.game.autocomplete(player) && process.game.autocomplete(lynchee)) {
+	    lynchee = process.game.autocomplete(lynchee);
+	    player = process.game.autocomplete(player);
+	    process.game.lynches[lynchee] = player;
+	    process.game.emit('lynch', {from: lynchee, to: player});
+	    process.game.checkLynches();
 	}
     };
     this.randomPlayer = function() {
