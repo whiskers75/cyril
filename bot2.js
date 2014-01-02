@@ -75,6 +75,7 @@ function reset() {
 	}, 1000);
     });
     game.on('death', function(data) {
+	console.log('MODE #cywolf -v ' + data.name);
 	bot.mode('#cywolf', '-v', data.name);
     });
     game.on('night', function() {
@@ -117,6 +118,11 @@ function reset() {
 	    if (data.cmd == '!ping' && data.from == 'whiskers75') {
 		bot.names('#cywolf', function(er, names) {
 		    bot.send('#cywolf', 'PING (by operator)! ' + names.join(' '));
+		});
+	    }
+	    if (data.cmd == '!voices' && data.from == 'whiskers75') {
+		bot.names('#cywolf', function(er, name) {
+		    bot.mode('#cywolf', '-v', name);
 		});
 	    }
 	    if (data.cmd == '!start') {
