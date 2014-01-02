@@ -6,7 +6,7 @@
 	"start": "node bot.js"
     },
     "dependencies": {
-	"irc": "*",
+	"slate-irc": "*",
 	"jade": "*",
 	"winston": "*",
 	"irc-colors": "*",
