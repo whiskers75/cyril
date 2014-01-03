@@ -2,6 +2,7 @@ var irc = require('slate-irc');
 var c = require('irc-colors');
 var winston = require('winston');
 var net = require('net');
+var idletimes = {};
 var Wolfgame = require('./wolfgame.js');
 var stream = net.connect({
     port: 6667,
@@ -17,11 +18,31 @@ bot.join('#cywolf');
 String.prototype.repeat = function( num ) {
     return new Array( num + 1 ).join( this );
 };
+var topic = 'Cywolf 2 | BETA, please bear with us | Roles API implemented | Happy new year, and don\'t break it too badly!';
 function reset() {
     winston.info('Cywolf 2 reset!');
     bot.mode('#cywolf', '-m');
+    bot.on('topic', function(data) {
+	if (topic !== data.topic) {
+	    setTimeout(function() {
+		bot.topic('#cywolf', topic);
+	    }, 2000);
+	}
+    });
+    bot.names('#cywolf', function(er, names) {
+	setTimeout(function() {
+	    var n;
+	    var i = setInterval(function() {
+		if (names.length == 0) {
+                    bot.send('#cywolf', 'Welcome to Cywolf 2. Start a game with !join.');
+                    return clearInterval(i);
+		}
+		n = names.splice(0, (names.length < 4 ? names.length : 4));
+		bot.mode('#cywolf', '-' + 'v'.repeat(n.length), n.join(' '));
+	    }, 500);
+	}, 1000);
+    });
     var game = new Wolfgame();
-    bot.send('#cywolf', 'Welcome to Cywolf 2. Start a game with !join.');
     game.on('joined', function(data) {
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
     });
@@ -71,12 +92,17 @@ function reset() {
 	    if (!game.over) {
 		bot.send('#cywolf', c.bold('☀') + ' It is now day.');
 		bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
-	    }
+                bot.send('#cywolf', 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
+		setTimeout(function() {
+		    if (game.phase == 'day') {
+			game.emit('night');
+		    }
+                }, _k(process.game.players).length * 60000);
+            }
 	}, 1000);
     });
     game.on('death', function(data) {
-	console.log('MODE #cywolf -v ' + data.name);
-	bot.mode('#cywolf', '-v', data.name);
+	bot.mode('#cywolf', '-v', data.player);
     });
     game.on('night', function() {
 	_k(game.players).forEach(function(player) {
@@ -92,6 +118,7 @@ function reset() {
         bot.send('#cywolf', c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).');
     });
     bot.on('message', function(data) {
+	idletimes[data.from] = new Date().getTime() / 1000;
 	data.cmd = data.message.split(' ')[0];
 	data.args = data.message.split(' ');
         if (data.cmd == '!freset' && data.from == 'whiskers75') {
@@ -164,3 +191,4 @@ bot.on('join', function(data) {
     reset();
 });
 
+	

@@ -1,6 +1,0 @@
-var Villager = function() {
-    this.team = 'villager';
-    this.toString = function() {
-	return 'villager';
-    };
-};
