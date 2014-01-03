@@ -46,7 +46,6 @@ function reset() {
     });
     game = new Wolfgame();
     idleint = setInterval(function() {
-        if (typeof game != "undefined") {
             if (game.phase !== 'start') {
                 console.log('idle timers activated');
                 _k(game.players).forEach(function(player) {
@@ -58,7 +57,6 @@ function reset() {
                     }
                 });
             }
-        }
     }, 5000);
     game.on('joined', function(data) {
         bot.mode('#cywolf', '+v', data.player);
