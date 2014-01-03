@@ -19,7 +19,7 @@ bot.join('#cywolf');
 String.prototype.repeat = function( num ) {
     return new Array( num + 1 ).join( this );
 };
-var topic = 'Cywolf 2 | BETA, please bear with us | Roles API implemented | Happy new year, and don\'t break it too badly!';
+var topic = 'Cywolf 2 | http://cyril.whiskers75.com | Roles: [4] wolf, seer [6] cursed villager';
 function reset() {
     winston.info('Cywolf 2 reset!');
     bot.mode('#cywolf', '-m');
