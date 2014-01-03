@@ -67,7 +67,7 @@ var Wolfgame = function() {
 		isDay = false;
 	    }
 	}
-	    
+	
 	this.emit('death', {player: player, reason: reason, isDay: isDay, role: this.players[player]});
         delete this.players[player];
         if (this.phase !== 'start') {
@@ -166,6 +166,7 @@ var Wolfgame = function() {
         this.players = {};
         this.phase = 'start';
         this.lynches = {};
+	this.removeAllListeners();
     });
     this.on('join', function(data) {
 	if (this.phase != 'start') {
