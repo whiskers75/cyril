@@ -138,13 +138,13 @@ function reset() {
     game.on('death', function(data) {
 	if (data.isDay) {
             bot.send('#cywolf', c.bold('☀') + ' It is now day. The villagers search the village...');
-            bot.send('#cywolf', c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(game.players[data.player]) + '.');
+            bot.send('#cywolf', c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(data.role) + '.');
             bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
             bot.send('#cywolf', 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
 	    bot.mode('#cywolf', '-v', data.player);
 	}
 	else {
-            bot.send('#cywolf', c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(game.players[data.player]) + '.');
+            bot.send('#cywolf', c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(data.role) + '.');
 	}
     });
     game.on('night', function() {

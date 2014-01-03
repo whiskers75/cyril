@@ -67,14 +67,13 @@ var Wolfgame = function() {
 		isDay = false;
 	    }
 	}
-	setTimeout(function() {
-	    delete this.players[player];
-            if (this.phase !== 'start') {
-                return this.checkEnd();
-            }
-	}, 1000);
-	this.emit('death', {player: player, reason: reason, isDay: isDay});
-	
+	    
+	this.emit('death', {player: player, reason: reason, isDay: isDay, role: this.players[player]});
+        delete this.players[player];
+        if (this.phase !== 'start') {
+            return this.checkEnd();
+        }
+        
     };
     this.autocomplete = function(player) {
         _k(this.players).forEach(function(p) {
