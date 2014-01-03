@@ -3,6 +3,7 @@ var _k = Object.keys;
 var util = require('util');
 var Chance = require('chance');
 var chance = new Chance();
+var coffee = require('coffee-script');
 var EventEmitter = require('events').EventEmitter;
 var Wolfgame = function() {
     this.players = {};
@@ -11,7 +12,7 @@ var Wolfgame = function() {
     this.over = false;
     this.c = require('irc-colors');
     /* Roles */
-    this.Seer = require('./roles/seer.js');
+    this.Seer = require('./roles/seer.coffee');
     this.Wolf = require('./roles/wolf.js');
     this.Villager = require('./roles/villager.js');
     this.killing = [];
