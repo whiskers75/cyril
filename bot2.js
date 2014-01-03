@@ -3,7 +3,6 @@ var c = require('irc-colors');
 var winston = require('winston');
 var net = require('net');
 var idletimes = {};
-var game = {};
 var Wolfgame = require('./wolfgame.js');
 var stream = net.connect({
     port: 6667,
@@ -20,6 +19,7 @@ String.prototype.repeat = function( num ) {
     return new Array( num + 1 ).join( this );
 };
 var topic = 'Cywolf 2 | http://cyril.whiskers75.com | Roles: [4] wolf, seer [6] cursed villager';
+var game;
 function reset() {
     winston.info('Cywolf 2 reset!');
     bot.mode('#cywolf', '-m');
@@ -43,7 +43,7 @@ function reset() {
 	    }, 500);
 	}, 1000);
     });
-    var game = new Wolfgame();
+    game = new Wolfgame();
     game.on('joined', function(data) {
         bot.mode('#cywolf', '+v', data.player);
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
@@ -135,6 +135,9 @@ function reset() {
 	data.cmd = data.message.split(' ')[0];
 	data.args = data.message.split(' ');
         if (data.cmd == '!freset' && data.from == 'whiskers75') {
+            game.removeAllListeners();
+            bot.removeAllListeners('nick');
+            bot.removeAllListeners('part');
             reset();
         }
 	if (game.phase == 'start') {
