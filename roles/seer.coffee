@@ -8,10 +8,8 @@ Seer = (Wolfgame) ->
         this.act = (player) ->
                 if Wolfgame.autocomplete(player)
                         player = Wolfgame.autocomplete(player)
-                                var role = Wolfgame.players[player].toString();
-                                if (role == 'cursed villager') {
-                                        role = 'wolf';
-                                        }
+                        role = Wolfgame.players[player].toString()
+                        role = 'wolf' if role == 'cursed villager'
                         Wolfgame.pm(this.name, Wolfgame.c.green('You have a vision; in this vision you see that ') + Wolfgame.c.bold.green(player) + Wolfgame.c.green(' is a ') + Wolfgame.c.bold.green(role) + Wolfgame.c.green('!'))
                         this.acted = true
                         
