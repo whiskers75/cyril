@@ -162,12 +162,6 @@ var Wolfgame = function() {
 	});
 	return this.emit('night');
     };
-    this.on('gameover', function() {
-        this.players = {};
-        this.phase = 'start';
-        this.lynches = {};
-	this.removeAllListeners();
-    });
     this.on('join', function(data) {
 	if (this.phase != 'start') {
 	    return this.emit('error', new Error('You can\'t join or quit now!'));
@@ -224,6 +218,12 @@ var Wolfgame = function() {
 		p.acted = false;
 	    }
 	});
+    });
+    this.on('gameover', function() {
+        this.players = {};
+        this.phase = 'start';
+        this.lynches = {};
+        this.removeAllListeners().removeAllListeners('join').removeAllListeners('quit');
     });
 };
 util.inherits(Wolfgame, EventEmitter);
