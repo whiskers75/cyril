@@ -67,11 +67,13 @@ var Wolfgame = function() {
 		isDay = false;
 	    }
 	}
-	delete this.players[player];
-	this.emit('death', {player: player, reason: reason, isDay: isDay});
-	if (this.phase !== 'start') {
-	    return this.checkEnd();
-	}
+	
+	this.emit('death', {player: player, reason: reason, isDay: isDay, role: this.players[player]});
+        delete this.players[player];
+        if (this.phase !== 'start') {
+            return this.checkEnd();
+        }
+        
     };
     this.autocomplete = function(player) {
         _k(this.players).forEach(function(p) {
@@ -160,11 +162,6 @@ var Wolfgame = function() {
 	});
 	return this.emit('night');
     };
-    this.on('gameover', function() {
-        this.players = {};
-        this.phase = 'start';
-        this.lynches = {};
-    });
     this.on('join', function(data) {
 	if (this.phase != 'start') {
 	    return this.emit('error', new Error('You can\'t join or quit now!'));
@@ -221,6 +218,13 @@ var Wolfgame = function() {
 		p.acted = false;
 	    }
 	});
+    });
+    this.on('gameover', function() {
+        this.players = {};
+        this.phase = 'start';
+        this.lynches = {};
+        this.removeAllListeners().removeAllListeners('join').removeAllListeners('quit');
+	delete this;
     });
 };
 util.inherits(Wolfgame, EventEmitter);
