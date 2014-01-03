@@ -9,6 +9,15 @@ var stream = net.connect({
     port: 6667,
     host: 'irc.freenode.org'
 });
+function clone(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+}
+
 var bot = irc(stream);
 var _k = Object.keys;
 winston.info('Starting Cywolf 2');
@@ -20,7 +29,7 @@ String.prototype.repeat = function( num ) {
     return new Array( num + 1 ).join( this );
 };
 var topic = 'Cywolf 2 | http://cyril.whiskers75.com | Roles: [4] wolf, seer [6] cursed villager | IDLE FOR 2 MINUTES INGAME AND GET KICKED WITHOUT WARNING!';
-var game;
+var game = new Wolfgame();
 var idleint;
 function reset() {
     winston.info('Cywolf 2 reset!');
@@ -45,7 +54,7 @@ function reset() {
 	    }, 500);
 	}, 1000);
     });
-    game = new Wolfgame();
+    game = new game.constructor();
     idleint = setInterval(function() {
             if (game.phase !== 'start') {
                 _k(game.players).forEach(function(player) {

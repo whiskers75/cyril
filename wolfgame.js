@@ -224,6 +224,7 @@ var Wolfgame = function() {
         this.phase = 'start';
         this.lynches = {};
         this.removeAllListeners().removeAllListeners('join').removeAllListeners('quit');
+	delete this;
     });
 };
 util.inherits(Wolfgame, EventEmitter);
