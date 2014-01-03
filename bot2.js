@@ -45,9 +45,11 @@ function reset() {
     });
     var game = new Wolfgame();
     game.on('joined', function(data) {
+        bot.mode('#cywolf', '+v', data.player);
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
     });
     game.on('quitted', function(data) {
+        bot.mode('#cywolf', '-v', data.player);
         bot.send('#cywolf', c.bold(data.player) + ' quit Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
     });
     game.on('lynch', function(data) {
@@ -74,7 +76,7 @@ function reset() {
     });
     bot.on('part', function(data) {
 	if (_k(game.players).indexOf(data.nick) !== -1) {
-	    if (game.phase !== 'joins') {
+	    if (game.phase !== 'start') {
 		game.kill(data.nick, ' left the village, and died.');
 	    }
 	    else {
@@ -84,8 +86,12 @@ function reset() {
     });
     bot.on('nick', function(data) {
 	if (_k(game.players).indexOf(data.nick) !== -1) {
-	    game.players[data.new] = game.players[data.nick];
-	    delete game.players[data.nick];
+            if (game.phase !== 'start') {
+                game.kill(data.nick, ' died of the horrible Nick-Changing Disease.');
+            }
+            else {
+                game.emit('quit', {player: data.nick});
+            }
 	}
     });
     game.on('day', function() {
@@ -127,11 +133,11 @@ function reset() {
         }
 	if (game.phase == 'start') {
 	    if (data.cmd == '!join') {
-		bot.mode('#cywolf', '+v', data.from);
+		
 		game.emit('join', {player: data.from.toString()});
 	    }
 	    if (data.cmd == '!quit' || data.cmd == '!leave') {
-                bot.mode('#cywolf', '-v', data.from);
+                
 		game.emit('quit', {player: data.from.toString()});
 	    }
 	    if (data.cmd == '!away') {
