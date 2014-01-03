@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Cywolf 2.0 by whiskers75</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Cywolf 2.0</h1>
+        <h2>My attempts at making a clone of pywolf.</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/whiskers75/cyril/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/whiskers75/cyril/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/whiskers75/cyril" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>Cywolf 2.0 is the next generation in the game of Werewolf. With a fast, speedy JavaScript game engine, an rapid, easy Roles API, and easy portability, this is the future.</p>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Quick, easy Roles API for rapid development of new roles</li>
+<li>It's modularized - easily ported away from IRC</li>
+<li>Grab data from the currently running game with the internal API</li>
+<li>And more to come!</li>
+</ul><h2>
+<a name="roles" class="anchor" href="#roles"><span class="octicon octicon-link"></span></a>Roles</h2>
+
+<p>Currently implemented roles: wolf, seer</p>
+
+<p><strong>How easy is it to make roles?</strong> Here's the Seer code, in CoffeeScript:</p>
+
+<pre><code>Villager = require('./villager.js');
+util = require('util');
+Seer = (Wolfgame) -&gt;
+        this.toString () -&gt; return 'Seer';
+        this.acted = false;
+        this.canAct = true;
+        this.description = 'You can see one person per night, and reveal their role.';
+        this.act (player) -&gt;
+                    if Wolfgame.autocomplete(player)
+                            player = Wolfgame.autocomplete(player)
+                            Wolfgame.pm(this.name, Wolfgame.c.green('You have a vision; in this vision you see that ') + Wolfgame.c.bold.green(player) + Wolfgame.c.green(' is a ') + Wolfgame.c.bold.green(Wolfgame.players[player]) + Wolfgame.c.green('!'));
+                            this.acted = true;
+
+util.inherits(Seer, Villager);
+module.exports = Seer;
+</code></pre>
+
+<h2>
+<a name="where-can-i-try-it" class="anchor" href="#where-can-i-try-it"><span class="octicon octicon-link"></span></a>Where can I try it?</h2>
+
+<p>You can try the beta at #cywolf on irc.freenode.net. Please be warned that this is beta, it will have bugs, those bugs will be evil and try to eat you and you might randomly be killed in the night.</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
