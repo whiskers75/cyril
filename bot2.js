@@ -29,7 +29,7 @@ function reset() {
 	if (topic !== data.topic) {
 	    setTimeout(function() {
 		bot.topic('#cywolf', topic);
-	    }, 2000);
+	    }, 5000);
 	}
     });
     bot.names('#cywolf', function(er, names) {
@@ -63,7 +63,12 @@ function reset() {
     }, 5000);
     game.on('joined', function(data) {
         bot.mode('#cywolf', '+v', data.player);
-	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
+	if (_k(game.players).length == 1) {
+	    bot.send('#cywolf', c.bold(data.player) + ' started a game of Cywolf. !join to join, !quit to leave, and !start to start.');
+	}
+	else {
+	    bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
+	}
     });
     game.on('quitted', function(data) {
         bot.mode('#cywolf', '-v', data.player);
@@ -116,13 +121,13 @@ function reset() {
             }
 	}
     });
-    game.on('day', function() {
+    game.on('day#nodeath', function() {
 	setTimeout(function() {
 	    if (!game.over && !over) {
-		bot.send('#cywolf', c.bold('☀') + ' It is now day.');
-		bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
+                bot.send('#cywolf', c.bold('☀') + ' It is now day. Nobody seems to have been killed during the night.');
+                bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
                 bot.send('#cywolf', 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
-		setTimeout(function() {
+                setTimeout(function() {
 		    if (game.phase == 'day') {
 			game.emit('night');
 		    }
@@ -131,7 +136,16 @@ function reset() {
 	}, 1000);
     });
     game.on('death', function(data) {
-	bot.mode('#cywolf', '-v', data.player);
+	if (data.isDay) {
+            bot.send('#cywolf', c.bold('☀') + ' It is now day. The villagers search the village...');
+            bot.send('#cywolf', c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(game.players[data.player]) + '.');
+            bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
+            bot.send('#cywolf', 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
+	    bot.mode('#cywolf', '-v', data.player);
+	}
+	else {
+            bot.send('#cywolf', c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(game.players[data.player]) + '.');
+	}
     });
     game.on('night', function() {
 	_k(game.players).forEach(function(player) {

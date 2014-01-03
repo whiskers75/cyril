@@ -58,10 +58,17 @@ var Wolfgame = function() {
 	}
 	return false;
     };
-    this.kill = function(player, reason) {
-	this.emit('message', {message: this.c.bold(player) + (reason ? reason : ' was mauled by werewolves and died.') + ' It appears that they were a ' + this.c.bold(this.players[player]) + '.'});
+    this.kill = function(player, reason, isDay) {
+	if (typeof isDay == 'undefined') {
+	    isDay = false;
+	}
+	else {
+	    if (!isDay) {
+		isDay = false;
+	    }
+	}
 	delete this.players[player];
-	this.emit('death', {player: player, reason: reason});
+	this.emit('death', {player: player, reason: reason, isDay: isDay});
 	if (this.phase !== 'start') {
 	    return this.checkEnd();
 	}
@@ -203,7 +210,10 @@ var Wolfgame = function() {
 	this.phase = 'day';
 	this.lynches = {};
 	if (this.killing) {
-	    this.kill(this.killing, ' was mauled by wolves and died.');
+	    this.kill(this.killing, ' was mauled by wolves and died.', true);
+	}
+	else {
+	    this.emit('day#nodeath');
 	}
 	_k(this.players).forEach(function(p) {
 	    p = process.game.players[p];
