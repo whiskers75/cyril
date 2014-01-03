@@ -28,19 +28,11 @@ bot.join('#cywolf');
 String.prototype.repeat = function( num ) {
     return new Array( num + 1 ).join( this );
 };
-var topic = 'Cywolf 2 | http://cyril.whiskers75.com | Roles: [4] wolf, seer [6] cursed villager | IDLE FOR 2 MINUTES INGAME AND GET KICKED WITHOUT WARNING!';
 var game = new Wolfgame();
 var idleint;
 function reset() {
     winston.info('Cywolf 2 reset!');
     bot.mode('#cywolf', '-m');
-    bot.on('topic', function(data) {
-	if (topic !== data.topic) {
-	    setTimeout(function() {
-		bot.topic('#cywolf', topic);
-	    }, 5000);
-	}
-    });
     bot.names('#cywolf', function(er, names) {
 	setTimeout(function() {
 	    var n;
