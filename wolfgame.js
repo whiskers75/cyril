@@ -143,6 +143,11 @@ var Wolfgame = function() {
 	});
 	return this.emit('night');
     };
+    this.on('gameover', function() {
+        this.players = {};
+        this.phase = 'start';
+        this.lynches = {};
+    });
     this.on('join', function(data) {
 	if (this.phase != 'start') {
 	    return this.emit('error', new Error('You can\'t join or quit now!'));

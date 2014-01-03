@@ -3,6 +3,7 @@ var c = require('irc-colors');
 var winston = require('winston');
 var net = require('net');
 var idletimes = {};
+var game = {};
 var Wolfgame = require('./wolfgame.js');
 var stream = net.connect({
     port: 6667,
@@ -191,4 +192,4 @@ bot.on('join', function(data) {
     reset();
 });
 
-	
+
