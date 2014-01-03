@@ -8,7 +8,7 @@ Seer = (Wolfgame) ->
         this.act = (player) ->
                 if Wolfgame.autocomplete(player)
                         player = Wolfgame.autocomplete(player)
-                        Wolfgame.pm(this.name, Wolfgame.c.green('You have a vision; in this vision you see that ') + Wolfgame.c.bold.green(player) + Wolfgame.c.green(' is a ') + Wolfgame.c.bold.green(Wolfgame.players[player]) + Wolfgame.c.green('!'))
+                        Wolfgame.pm(this.name, Wolfgame.c.green('You have a vision; in this vision you see that ') + Wolfgame.c.bold.green(player) + Wolfgame.c.green(' is a ') + Wolfgame.c.bold.green((Wolfgame.players[player].toString() == 'cursed villager' ? 'wolf' : Wolfgame.players[player].toString())) + Wolfgame.c.green('!'))
                         this.acted = true
                         
         return this

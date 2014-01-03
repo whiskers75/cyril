@@ -3,6 +3,7 @@ var Villager = function() {
     this.toString = function() {
 	return 'villager';
     };
+    this.onNight = false;
     this.acted = true;
     this.canAct = false;
     this.name = 'bob';

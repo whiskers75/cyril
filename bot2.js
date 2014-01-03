@@ -121,6 +121,9 @@ function reset() {
 		bot.send(player.name, 'You can act on the following: ' + _k(game.players).join(', '));
 		bot.send(player.name, 'PM me "act [player]" to act on that player (see your description).');
 	    }
+	    if (player.onNight) {
+		player.onNight();
+	    }
 	});
         bot.send('#cywolf', c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).');
     });

@@ -13,6 +13,7 @@ var Wolfgame = function() {
     this.c = require('irc-colors');
     /* Roles */
     this.Seer = require('./roles/seer.coffee');
+    this.Cursed = require('./roles/cursed.coffee');
     this.Wolf = require('./roles/wolf.js');
     this.Villager = require('./roles/villager.js');
     this.killing = [];
@@ -123,7 +124,12 @@ var Wolfgame = function() {
 	roled.Seer = this.randomPlayer();
 	roled.push(roled.Seer);
 	delete this.players[roled.Seer];
-	process.game = this;
+	if (_k(this.players).length >= 4) {
+	    roled.Cursed = this.randomPlayer();
+	    roled.push(roled.Cursed);
+	    delete this.players[roled.Cursed];
+	}
+        process.game = this;
 	roled.forEach(function(player) {
 	    if (player == roled.Wolf) {
 		process.game.players[player] = new process.game.Wolf(process.game);
@@ -132,6 +138,10 @@ var Wolfgame = function() {
 	    if (player == roled.Seer) {
 		process.game.players[player] = new process.game.Seer(process.game);
                 process.game.players[player].name = player;
+	    }
+	    if (player == roled.Cursed) {
+		process.game.players[player] = new process.game.Cursed(process.game);
+		process.game.players[player].name = player;
 	    }
 	});
 	var defvil = new this.Villager(this);
