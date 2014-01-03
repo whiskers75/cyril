@@ -66,7 +66,6 @@ function reset() {
 	    bot.mode('#cywolf', '-v', player);
 	});
 	game.removeAllListeners();
-	bot.removeAllListeners();
 	reset();
     });
     game.on('pm', function(data) {
