@@ -3,6 +3,7 @@ var c = require('irc-colors');
 var winston = require('winston');
 var net = require('net');
 var idletimes = {};
+var over = false;
 var Wolfgame = require('./wolfgame.js');
 var stream = net.connect({
     port: 6667,
@@ -57,6 +58,9 @@ function reset() {
                 });
             }
     }, 5000);
+    setTimeout(function() {
+	over = false;
+    }, 5000);
     game.on('joined', function(data) {
         bot.mode('#cywolf', '+v', data.player);
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
@@ -78,6 +82,7 @@ function reset() {
 	_k(game.players).forEach(function(player) {
 	    bot.mode('#cywolf', '-v', player);
 	});
+	over = true;
 	game.removeAllListeners();
 	bot.removeAllListeners('nick');
 	bot.removeAllListeners('part');
@@ -113,7 +118,7 @@ function reset() {
     });
     game.on('day', function() {
 	setTimeout(function() {
-	    if (!game.over) {
+	    if (!game.over && !over) {
 		bot.send('#cywolf', c.bold('☀') + ' It is now day.');
 		bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
                 bot.send('#cywolf', 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
@@ -154,6 +159,12 @@ function reset() {
             bot.removeAllListeners('part');
             reset();
         }
+	if (data.cmd == '!fdie' && data.from == 'whiskers75') {
+	    bot.say('#cywolf', c.bold.red('Software Update initiated...'));
+	    bot.say('#cywolf', c.bold.red('Waiting for update...'));
+	    bot.removeAllListeners();
+	    game.removeAllListeners();
+	}
 	if (game.phase == 'start') {
 	    if (data.cmd == '!join') {
 		
