@@ -20,6 +20,7 @@ String.prototype.repeat = function( num ) {
 };
 var topic = 'Cywolf 2 | http://cyril.whiskers75.com | Roles: [4] wolf, seer [6] cursed villager | IDLE FOR 2 MINUTES INGAME AND GET KICKED WITHOUT WARNING!';
 var game;
+var idleint;
 function reset() {
     winston.info('Cywolf 2 reset!');
     bot.mode('#cywolf', '-m');
@@ -44,6 +45,21 @@ function reset() {
 	}, 1000);
     });
     game = new Wolfgame();
+    idleint = setInterval(function() {
+        if (typeof game != "undefined") {
+            if (game.phase !== 'start') {
+                console.log('idle timers activated');
+                _k(game.players).forEach(function(player) {
+                    if ((new Date().getTime / 1000) - idletimes[player] >= 120) {
+                        bot.send(player, c.bold.red('You have been idling for a while. Say something soon in #cywolf or you may be declared dead.'));
+                    }
+                    if ((new Date().getTime / 1000) - idletimes[player] >= 150) {
+                        game.kill(player, ' died of idling.');
+                    }
+                });
+            }
+        }
+    }, 5000);
     game.on('joined', function(data) {
         bot.mode('#cywolf', '+v', data.player);
 	bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
@@ -68,6 +84,7 @@ function reset() {
 	game.removeAllListeners();
 	bot.removeAllListeners('nick');
 	bot.removeAllListeners('part');
+	clearInterval(idleint);
 	reset();
     });
     game.on('pm', function(data) {
