@@ -207,7 +207,9 @@ bot.on('join', function(data) {
     reset();
 });
 setInterval(function() {
-    if (game.phase !== 'start') {
+    if (typeof game != "undefined") {
+	if (game.phase !== 'start') {
+	    console.log('idle timers activated');
 	_k(game.players).forEach(function(player) {
 	    if ((new Date().getTime / 1000) - idletimes[player] >= 120) {
 		bot.send(player, c.bold.red('You have been idling for a while. Say something soon in #cywolf or you may be declared dead.'));
@@ -216,5 +218,6 @@ setInterval(function() {
 		game.kill(player, ' died of idling.');
 	    }
 	});
+    }
     }
 }, 5000);
