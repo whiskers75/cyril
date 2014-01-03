@@ -223,7 +223,7 @@ var Wolfgame = function() {
         this.players = {};
         this.phase = 'start';
         this.lynches = {};
-        this.removeAllListeners().removeAllListeners('join').removeAllListeners('quit');
+        this.removeAllListeners();
 	delete this;
     });
 };
