@@ -13,10 +13,11 @@ var Wolfgame = function() {
     this.over = false;
     this.c = require('irc-colors');
     /* Roles */
-    this.Seer = require('./roles/seer.coffee');
-    this.Cursed = require('./roles/cursed.coffee');
-    this.Wolf = require('./roles/wolf.js');
-    this.Villager = require('./roles/villager.js');
+    this.roles = {};
+    this.roles.Seer = require('./roles/seer.coffee');
+    this.roles.Cursed = require('./roles/cursed.coffee');
+    this.roles.Wolf = require('./roles/wolf.js');
+    this.roles.Villager = require('./roles/villager.js');
     this.killing = [];
     this.checkEnd = function() {
 	var wolves = 0;
@@ -124,6 +125,15 @@ var Wolfgame = function() {
     };
     this.randomPlayer = function() {
         return _k(this.players)[chance.integer({min: 0, max: _k(this.players).length - 1})];
+    };
+    this.randomUPlayer = function() {
+	this.uplayers = [];
+	_k(this.players).forEach(function(player) {
+	    if (this.players[player] == 'unallocated') {
+		this.uplayers.push(player);
+	    }
+	});
+        return this.uplayers[chance.integer({min: 0, max: this.uplayers.length -1})];
     };
     this.allocate = function() {
 	// Allocate the roles
