@@ -6,6 +6,7 @@ var Villager = function() {
     this.onNight = false;
     this.acted = true;
     this.canAct = false;
+    this.minPlayers = 4;
     this.name = 'bob';
     this.description = 'Just an ordinary villager.';
 };
