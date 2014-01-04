@@ -9,6 +9,7 @@ var Wolfgame = function() {
     this.players = {};
     this.phase = 'start';
     this.lynches = {};
+    this.roled = [];
     this.over = false;
     this.c = require('irc-colors');
     /* Roles */
@@ -127,29 +128,38 @@ var Wolfgame = function() {
     this.allocate = function() {
 	// Allocate the roles
 	var roled = [];
-        roled.Wolf = this.randomPlayer();
-	roled.push(roled.Wolf);
-	delete this.players[roled.Wolf]; // Don't worry, we'll put it back later
-	roled.Seer = this.randomPlayer();
-	roled.push(roled.Seer);
-	delete this.players[roled.Seer];
-	if (_k(this.players).length >= 4) {
-	    roled.Cursed = this.randomPlayer();
-	    roled.push(roled.Cursed);
-	    delete this.players[roled.Cursed];
+        this.roled.Wolf = this.randomPlayer();
+	this.roled.push(roled.Wolf);
+	delete this.players[this.roled.Wolf]; // Don't worry, we'll put it back later
+	this.roled.Seer = this.randomPlayer();
+	this.roled.push(roled.Seer);
+	delete this.players[this.roled.Seer];
+	if ((_k(this.players).length + this.roled.length) >= 6) {
+	    this.roled.Cursed = this.randomPlayer();
+	    this.roled.push(this.roled.Cursed);
+	    delete this.players[this.roled.Cursed];
+	}
+        if ((_k(this.players).length + this.roled.length) >= 8) {
+	    this.roled.Drunk = this.randomPlayer();
+	    this.roled.push(this.roled.Drunk);
+	    delete this.players[this.roled.Drunk];
 	}
         process.game = this;
-	roled.forEach(function(player) {
-	    if (player == roled.Wolf) {
+	this.roled.forEach(function(player) {
+	    if (player == this.roled.Wolf) {
 		process.game.players[player] = new process.game.Wolf(process.game);
 		process.game.players[player].name = player;
 	    }
-	    if (player == roled.Seer) {
+	    if (player == this.roled.Seer) {
 		process.game.players[player] = new process.game.Seer(process.game);
                 process.game.players[player].name = player;
 	    }
-	    if (player == roled.Cursed) {
+	    if (player == this.roled.Cursed) {
 		process.game.players[player] = new process.game.Cursed(process.game);
+		process.game.players[player].name = player;
+	    }
+	    if (player == this.roled.Drunk) {
+		process.game.players[player] = new process.game.Drunk(process.game);
 		process.game.players[player].name = player;
 	    }
 	});
