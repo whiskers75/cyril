@@ -19,12 +19,14 @@ function clone(obj) {
 }
 
 var bot = irc(stream);
+var nick = process.env.NICK || 'cywolf2';
+var chan = process.env.CHAN || '#cywolf';
 var _k = Object.keys;
 winston.info('Starting Cywolf 2');
 bot.pass(process.env.PASSWORD);
-bot.nick('cywolf2');
+bot.nick(nick);
 bot.user('cywolf', 'Cywolf 2');
-bot.join('#cywolf');
+bot.join(chan);
 String.prototype.repeat = function( num ) {
     return new Array( num + 1 ).join( this );
 };
@@ -33,17 +35,17 @@ var game = new Wolfgame();
 var idleint;
 function reset() {
     winston.info('Cywolf 2 reset!');
-    bot.mode('#cywolf', '-m');
-    bot.names('#cywolf', function(er, names) {
+    bot.mode(chan, '-m');
+    bot.names(chan, function(er, names) {
 	setTimeout(function() {
 	    var n;
 	    var i = setInterval(function() {
 		if (names.length == 0) {
-                    bot.send('#cywolf', 'Welcome to Cywolf 2. Start a game with !join.');
+                    bot.send(chan, 'Welcome to Cywolf 2. Start a game with !join.');
                     return clearInterval(i);
 		}
 		n = names.splice(0, (names.length < 4 ? names.length : 4));
-		bot.mode('#cywolf', '-' + 'v'.repeat(n.length), n.join(' '));
+		bot.mode(chan, '-' + 'v'.repeat(n.length), n.join(' '));
 	    }, 500);
 	}, 1000);
     });
@@ -52,7 +54,7 @@ function reset() {
         if (game.phase !== 'start') {
             _k(game.players).forEach(function(player) {
                 if ((new Date().getTime / 1000) - idletimes[player] >= 120) {
-                    bot.send(player, c.bold.red('You have been idling for a while. Say something soon in #cywolf or you may be declared dead.'));
+                    bot.send(player, c.bold.red('You have been idling for a while. Say something soon in ' + chan + ' or you may be declared dead.'));
                 }
                 if ((new Date().getTime / 1000) - idletimes[player] >= 150) {
                     game.kill(player, ' didn\'t get out of bed for a long time and died.');
@@ -64,30 +66,30 @@ function reset() {
 	over = false;
     }, 5000);
     game.on('joined', function(data) {
-        bot.mode('#cywolf', '+v', data.player);
+        bot.mode(chan, '+v', data.player);
 	if (_k(game.players).length == 1) {
-	    bot.send('#cywolf', c.bold(data.player) + ' started a game of Cywolf. !join to join, !quit to leave, and !start to start.');
+	    bot.send(chan, c.bold(data.player) + ' started a game of Cywolf. !join to join, !quit to leave, and !start to start.');
 	}
 	else {
-	    bot.send('#cywolf', c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
+	    bot.send(chan, c.bold(data.player) + ' joined Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
 	}
     });
     game.on('quitted', function(data) {
-        bot.mode('#cywolf', '-v', data.player);
-        bot.send('#cywolf', c.bold(data.player) + ' quit Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
+        bot.mode(chan, '-v', data.player);
+        bot.send(chan, c.bold(data.player) + ' quit Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
     });
     game.on('lynch', function(data) {
-	bot.send('#cywolf', c.bold(data.from) + ' votes for ' + c.bold(data.to) + '.');
+	bot.send(chan, c.bold(data.from) + ' votes for ' + c.bold(data.to) + '.');
     });
     game.on('notice', function(data) {
 	bot.notice(data.to, data.message);
     });
     game.on('message', function(data) {
-	bot.send('#cywolf', data.message);
+	bot.send(chan, data.message);
     });
     game.on('gameover', function() {
 	_k(game.players).forEach(function(player) {
-	    bot.mode('#cywolf', '-v', player);
+	    bot.mode(chan, '-v', player);
 	});
 	over = true;
 	game.removeAllListeners();
@@ -101,8 +103,8 @@ function reset() {
 	bot.send(data.to, data.message);
     });
     game.on('starting', function() {
-        bot.send('#cywolf', _k(game.players).join(', ') + ': Welcome to Cywolf ' + game.c.bold('2.0') + ', the next generation of the game Wolfgame (or Mafia).');
-	bot.mode('#cywolf', '+m');
+        bot.send(chan, _k(game.players).join(', ') + ': Welcome to Cywolf ' + game.c.bold('2.0') + ', the next generation of the game Wolfgame (or Mafia).');
+	bot.mode(chan, '+m');
     });
     function onMessage(data) {
         idletimes[data.from] = new Date().getTime() / 1000;
@@ -110,7 +112,7 @@ function reset() {
         data.args = data.message.split(' ');
         if (data.cmd == '!freset' && data.from == 'whiskers75') {
             _k(game.players).forEach(function(player) {
-                bot.mode('#cywolf', '-v', player);
+                bot.mode(chan, '-v', player);
             });
             over = true;
             game.removeAllListeners();
@@ -121,8 +123,8 @@ function reset() {
             reset();
 	}
         if (data.cmd == '!fdie' && data.from == 'whiskers75') {
-            bot.say('#cywolf', c.bold.red('Software Update initiated...'));
-            bot.say('#cywolf', c.bold.red('Waiting for update...'));
+            bot.say(chan, c.bold.red('Software Update initiated...'));
+            bot.say(chan, c.bold.red('Waiting for update...'));
             bot.removeAllListeners();
             game.removeAllListeners();
         }
@@ -139,19 +141,19 @@ function reset() {
                 if (_k(game.players).indexOf(data.from) !== -1) {
                     game.emit('quit', {player: data.from.toString()});
                 }
-                bot.kick('#cywolf', data.from, 'You go be away somewhere else, or use /away next time.');
+                bot.kick(chan, data.from, 'You go be away somewhere else, or use /away next time.');
             }
             if (data.cmd == '!stats') {
-                bot.send('#cywolf', 'Players: ' + _k(game.players).join(' '));
+                bot.send(chan, 'Players: ' + _k(game.players).join(' '));
             }
             if (data.cmd == '!ping' && data.from == 'whiskers75') {
-                bot.names('#cywolf', function(er, names) {
-                    bot.send('#cywolf', 'PING (by operator)! ' + names.join(' '));
+                bot.names(chan, function(er, names) {
+                    bot.send(chan, 'PING (by operator)! ' + names.join(' '));
                 });
             }
             if (data.cmd == '!voices' && data.from == 'whiskers75') {
-                bot.names('#cywolf', function(er, name) {
-                    bot.mode('#cywolf', '-v', name);
+                bot.names(chan, function(er, name) {
+                    bot.mode(chan, '-v', name);
                 });
             }
             if (data.cmd == '!start') {
@@ -163,7 +165,7 @@ function reset() {
                 }
             }
         }
-        if (game.phase == 'night' && data.to == 'cywolf2') {
+        if (game.phase == 'night' && data.to == nick) {
             if (data.cmd == 'act' || data.cmd == 'see' || data.cmd == 'kill') {
                 if (game.players[data.from].canAct && !game.players[data.from].acted) {
                     game.players[data.from].act(data.args[1]);
@@ -211,9 +213,9 @@ function reset() {
     game.on('day#nodeath', function() {
 	setTimeout(function() {
 	    if (!game.over && !over) {
-                bot.send('#cywolf', c.bold('☀') + ' It is now day. Nobody seems to have been killed during the night.');
-                bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
-                bot.send('#cywolf', 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
+                bot.send(chan, c.bold('☀') + ' It is now day. Nobody seems to have been killed during the night.');
+                bot.send(chan, 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
+                bot.send(chan, 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
                 setTimeout(function() {
 		    if (game.phase == 'day') {
 			game.emit('night');
@@ -224,14 +226,14 @@ function reset() {
     });
     game.on('death', function(data) {
 	if (data.isDay) {
-            bot.send('#cywolf', c.bold('☀') + ' It is now day. The villagers search the village...');
-            bot.send('#cywolf', c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(data.role) + '.');
-            bot.send('#cywolf', 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
-            bot.send('#cywolf', 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
-	    bot.mode('#cywolf', '-v', data.player);
+            bot.send(chan, c.bold('☀') + ' It is now day. The villagers search the village...');
+            bot.send(chan, c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(data.role) + '.');
+            bot.send(chan, 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
+            bot.send(chan, 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
+	    bot.mode(chan, '-v', data.player);
 	}
 	else {
-            bot.send('#cywolf', c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(data.role) + '.');
+            bot.send(chan, c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(data.role) + '.');
 	}
     });
     game.on('night', function() {
@@ -248,12 +250,12 @@ function reset() {
 		player.onNight();
 	    }
 	});
-        bot.send('#cywolf', c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).');
+        bot.send(chan, c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).');
     });
     
 }
 bot.on('join', function(data) {
-    if (data.nick != 'cywolf2') {
+    if (data.nick != nick) {
 	return;
     }
     reset();
