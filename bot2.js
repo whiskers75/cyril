@@ -229,7 +229,7 @@ function reset() {
 	    if (!game.over && !over) {
                 bot.send(chan, c.bold('☀') + ' It is now day. Nobody seems to have been killed during the night.');
                 bot.send(chan, 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
-                bot.send(chan, 'A majority of ' + c.bold(_k(process.game.players).length - 2+) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
+                bot.send(chan, 'A majority of ' + c.bold(_k(process.game.players).length - 2) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
                 setTimeout(function() {
 		    if (game.phase == 'day') {
 			game.emit('night');
