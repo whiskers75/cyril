@@ -7,7 +7,7 @@ var over = false;
 var Wolfgame = require('./wolfgame.js');
 var stream = net.connect({
     port: 6667,
-    host: 'irc.freenode.org'
+    host: 'irc.freenode.net'
 });
 function clone(obj) {
     if (null == obj || "object" != typeof obj) return obj;
@@ -30,7 +30,6 @@ bot.join(chan);
 String.prototype.repeat = function( num ) {
     return new Array( num + 1 ).join( this );
 };
-var topic = 'Cywolf 2 | http://cyril.whiskers75.com | Roles: [4] wolf, seer [6] cursed villager | IDLE FOR 2 MINUTES INGAME AND GET KICKED WITHOUT WARNING!';
 var game = new Wolfgame();
 var idleint;
 function reset() {
@@ -42,6 +41,9 @@ function reset() {
 	    var i = setInterval(function() {
 		if (names.length == 0) {
                     bot.send(chan, 'Welcome to Cywolf 2. Start a game with !join.');
+		    if (chan == '#cywolf-beta') {
+			bot.send(chan, 'This is the ' + c.bold('beta') + ' testing channel. The main channel can be found at #cywolf.');
+		    }
                     return clearInterval(i);
 		}
 		n = names.splice(0, (names.length < 4 ? names.length : 4));
@@ -123,11 +125,23 @@ function reset() {
             reset();
 	}
         if (data.cmd == '!fdie' && data.from == 'whiskers75') {
-            bot.say(chan, c.bold.red('Software Update initiated...'));
-            bot.say(chan, c.bold.red('Waiting for update...'));
+            bot.send(chan, c.bold.red('Software Update initiated...'));
+            bot.send(chan, c.bold.red('Waiting for update...'));
             bot.removeAllListeners();
             game.removeAllListeners();
         }
+	if (game.phase != 'start') {
+	    if (data.cmd == '!idle') {
+		if (_k(game.players).indexOf(data.args[1])) {
+		    if ((new Date().getTime()) - idletimes[data.args[1]] >= 100) {
+			bot.send(chan, data.args[1] + ': ' + c.bold.red('You have been idling for a long time. Please say something soon or you may be declared dead.'));
+		    }
+                    if ((new Date().getTime()) - idletimes[data.args[1]] >= 150) {
+			game.kill(data.args[1], ' died of idling.');
+		    }
+		}
+	    }
+	}
         if (game.phase == 'start') {
             if (data.cmd == '!join') {
                 
@@ -157,7 +171,7 @@ function reset() {
                 });
             }
             if (data.cmd == '!start') {
-                if (_k(game.players).length >= 4 || data.from == 'whiskers75') {
+		if (_k(game.players).length >= 4 || data.from == 'whiskers75') {
                     game.emit('start');
                 }
                 else {
@@ -215,7 +229,7 @@ function reset() {
 	    if (!game.over && !over) {
                 bot.send(chan, c.bold('☀') + ' It is now day. Nobody seems to have been killed during the night.');
                 bot.send(chan, 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
-                bot.send(chan, 'A majority of ' + c.bold(_k(process.game.players).length - 1) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
+                bot.send(chan, 'A majority of ' + c.bold(_k(process.game.players).length - 2+) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise night will start ' + c.bold.red('without warning') + '.');
                 setTimeout(function() {
 		    if (game.phase == 'day') {
 			game.emit('night');
