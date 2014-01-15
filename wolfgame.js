@@ -9,14 +9,15 @@ var Wolfgame = function() {
     this.players = {};
     this.phase = 'start';
     this.lynches = {};
+    this.dead = {};
     this.over = false;
+    this.timeouts = [];
     this.c = require('irc-colors');
     /* Roles */
     this.Seer = require('./roles/seer.coffee');
     this.Cursed = require('./roles/cursed.coffee');
     this.Wolf = require('./roles/wolf.js');
     this.Villager = require('./roles/villager.js');
-    this.killing = [];
     this.checkEnd = function() {
 	var wolves = 0;
 	var vills = 0;
@@ -29,62 +30,66 @@ var Wolfgame = function() {
 	    }
 	});
 	if (wolves >= vills || vills == 0) {
-	    process.game.emit('message', {message: process.game.c.bold('Game over!') + ' The wolves have enough to outnumber the villagers. They do so and win.'});
-	    process.game.emit('message', {message: process.game.c.bold('The ' + process.game.c.red('wolves') + ' win!')});
-	    var winstr = '';
-            _k(process.game.players).forEach(function(player) {
-                if (process.game.players[player].toString() !== 'villager') {
-                    winstr += process.game.c.bold(player) + ' was a ' + process.game.c.bold(process.game.players[player].toString()) + '. ';
-                }
-            });
-            process.game.emit('message', {message: winstr});
-	    process.game.emit('gameover');
+	    process.game.emit('gameover', {win: 'wolves'});
 	    process.game.over = true;
 	    return true;
 	}
 	if (wolves == 0) {
-	    process.game.emit('message', {message: process.game.c.bold('Game over!') + ' All the wolves are dead! The villagers chop them up, BBQ them and have a hearty meal.'});
-            process.game.emit('message', {message: process.game.c.bold('The ' + process.game.c.green('villagers') + ' win!')});
-	    var winstr = '';
-            _k(process.game.players).forEach(function(player) {
-                if (process.game.players[player].toString() !== 'villager') {
-                    winstr += process.game.c.bold(player) + ' was a ' + process.game.c.bold(process.game.players[player].toString()) + '. ';
-                }
-            });
-	    process.game.emit('message', {message: winstr});
-	    process.game.emit('gameover');
+	    process.game.emit('gameover', {win: 'villagers'});
 	    process.game.over = true;
 	    return true;
 	}
 	return false;
     };
-    this.kill = function(player, reason, isDay) {
-	if (typeof isDay == 'undefined') {
-	    isDay = false;
+    this.kill = function(player, reason, hooks) {
+	if (typeof hooks == 'undefined') {
+	    hooks = false;
 	}
-	else {
-	    if (!isDay) {
-		isDay = false;
-	    }
-	}
-	
-	this.emit('death', {player: player, reason: reason, isDay: isDay, role: this.players[player]});
+	this.emit('death', {player: player, reason: reason, role: this.players[player]});
+	this.dead[player] = this.players[player];
         delete this.players[player];
         if (this.phase !== 'start') {
-            return this.checkEnd();
+	    var end = this.checkEnd();
+	    if (!end) {
+		if (this.dead[player].onDeath) {
+		    player.onDeath(this, player.name);
+		}
+		/* This bit has a weird bug.
+		_k(this.players).forEach(function(p) {
+		    p = this.players[p];
+		    if (p.onOtherDeath) {
+		    p.onOtherDeath(process.game, player.name);
+		    }
+		    });
+			*/
+		if (hooks) {
+		    hooks.after(this, player);
+		}
+	    }
+	    return end;
         }
         
     };
-    this.autocomplete = function(player) {
+    this.autocomplete = function(player, from) {
+	var count = 0;
         _k(this.players).forEach(function(p) {
-            if (p.indexOf(player) !== -1) {
+            if (p.indexOf(player) == 0) {
                 player = p;
+		count++;
             }
         });
         if (_k(this.players).indexOf(player) == -1) {
-            this.emit('notice', {to: player, message: 'That player does not exist.'});
+	    if (from) {
+		this.emit('notice', {to: from, message: 'That player does not exist.'});
+	    }
             return false;
         }
+	if (count > 1) {
+	    if (from) {
+		this.emit('notice', {to: from, message: 'Ambiguous autocompletion. Please refine!'});
+	    }
+            return false;
+	}
 	return player;
     };
     this.pm = function(to, message) {
@@ -104,7 +109,7 @@ var Wolfgame = function() {
         });
         Object.keys(votes).forEach(function(vote) {
             var voted = votes[vote];
-            if (voted >= (_k(process.game.players).length - 1)) {
+            if (voted >= (_k(process.game.players).length - (_k(process.game.players).length > 4 ? 2 : 1))) {
 		if (!process.game.kill(vote, ' was lynched by the angry mob of villagers.')) {
 		    process.game.emit('night');
 		}
@@ -197,34 +202,38 @@ var Wolfgame = function() {
     this.on('night', function() {
 	this.phase = 'night';
 	this.killing = '';
-	setTimeout(function() {
+	this.timeouts.forEach(function(t) {
+	    clearTimeout(t);
+	});
+	this.timeouts.push(setTimeout(function() {
 	    if (this.phase == 'night') {
 		this.emit('day');
 	    }
-	}, 120000);
+	}, 120000));
     });
     this.on('day', function() {
 	this.phase = 'day';
 	this.lynches = {};
-	if (this.killing) {
-	    this.kill(this.killing, ' was mauled by wolves and died.', true);
-	}
-	else {
-	    this.emit('day#nodeath');
-	}
+        this.timeouts.forEach(function(t) {
+            clearTimeout(t);
+        });
 	_k(this.players).forEach(function(p) {
+	    if (typeof p == 'undefined') {
+		return;
+	    }
 	    p = process.game.players[p];
 	    if (p.canAct) {
 		p.acted = false;
 	    }
+	    if (p.onDay) {
+		p.onDay();
+	    }
 	});
     });
     this.on('gameover', function() {
-        this.players = {};
-        this.phase = 'start';
-        this.lynches = {};
-        this.removeAllListeners().removeAllListeners('join').removeAllListeners('quit');
-	delete this;
+        this.timeouts.forEach(function(t) {
+            clearTimeout(t);
+        });
     });
 };
 util.inherits(Wolfgame, EventEmitter);
