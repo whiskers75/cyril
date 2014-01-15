@@ -155,7 +155,7 @@ function reset() {
                 if (_k(game.players).indexOf(data.from) !== -1) {
                     game.emit('quit', {player: data.from.toString()});
                 }
-                bot.kick(chan, data.from, 'You go be away somewhere else, or use /away next time.');
+                bot.kick(chan, data.from, 'Please use /away instead.');
             }
             if (data.cmd == '!stats') {
                 bot.send(chan, 'Players: ' + _k(game.players).join(' '));
@@ -179,8 +179,8 @@ function reset() {
                 }
             }
         }
-        if (game.phase == 'night' && data.to == nick) {
-            if (data.cmd == 'act' || data.cmd == 'see' || data.cmd == 'kill') {
+        if (game.phase == 'night' && data.to == nick && _k(game.players).indexOf(data.from) !== -1) {
+            if (game.players[data.from].canAct && data.cmd == game.players[data.from].actName) {
                 if (game.players[data.from].canAct && !game.players[data.from].acted) {
                     game.players[data.from].act(data.args[1]);
                     var done = true;
@@ -257,8 +257,8 @@ function reset() {
 		bot.send(player.name, 'You are a ' + c.bold(player.toString()) + '.');
 		bot.send(player.name, 'Your role description is:');
 		bot.send(player.name, player.description);
-		bot.send(player.name, 'You can act on the following: ' + _k(game.players).join(', '));
-		bot.send(player.name, 'PM me "act [player]" to act on that player (see your description).');
+		bot.send(player.name, 'You can ' + player.actName + ' the following: ' + _k(game.players).join(', '));
+		bot.send(player.name, 'PM me "' + player.actName + ' [player]" to act on that player (see your description).');
 	    }
 	    if (player.onNight) {
 		player.onNight();

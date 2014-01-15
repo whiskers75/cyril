@@ -7,6 +7,7 @@ var Villager = function() {
     this.acted = true;
     this.canAct = false;
     this.name = 'bob';
+    this.actName = 'derp';
     this.description = 'Just an ordinary villager.';
 };
 module.exports = Villager;

@@ -4,6 +4,7 @@ Seer = (Wolfgame) ->
         this.toString = () -> return 'seer'
         this.acted = false
         this.canAct = true
+        this.actName = 'see'
         this.description = 'You can see one person per night, and reveal their role.'
         this.act = (player) ->
                 if Wolfgame.autocomplete(player)

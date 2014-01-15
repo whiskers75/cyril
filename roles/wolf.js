@@ -4,6 +4,7 @@ var Wolf = function(Wolfgame) {
     this.acted = false;
     this.canAct = true;
     this.team = 'wolf';
+    this.actName = 'kill';
     this.toString = function() {
 	return 'wolf';
     };
