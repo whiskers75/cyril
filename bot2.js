@@ -3,8 +3,10 @@ var c = require('irc-colors');
 var winston = require('winston');
 var net = require('net');
 var rate = true;
+var rate2 = true;
 var idletimes = {};
 var over = false;
+var away = [];
 var Wolfgame = require('cywolf');
 var stream = net.connect({
     port: 6667,
@@ -150,19 +152,56 @@ function reset() {
                 game.emit('quit', {player: data.from.toString()});
             }
             if (data.cmd == '!away') {
-                if (_k(game.players).indexOf(data.from) !== -1) {
-                    game.emit('quit', {player: data.from.toString()});
+                if (away.indexOf(data.from) == -1) {
+		    away.push(data.from);
+		}
+		bot.notice(data.from, 'You are now marked as away.');
+            }
+            if (data.cmd == '!back') {
+                if (away.indexOf(data.from) !== -1) {
+                    away.splice(away.indexOf(data.from), 1);
                 }
-                bot.kick(chan, data.from, 'Please use /away instead.');
+                bot.notice(data.from, 'You are no longer marked as away.');
             }
             if (data.cmd == '!stats') {
                 bot.send(chan, 'Players: ' + _k(game.players).join(' '));
             }
+	    if (data.cmd == '!roles') {
+		if (rate2) {
+		    var rolel = [];
+                    fs.readdir(__dirname + '/node_modules/cywolf/roles', function(err, roles) {
+			if (err) {
+			    return;
+			}
+			roles.forEach(function(role) {
+			    try {
+				role = require(__dirname = '/node_modules/cywolf/roles' + role);
+			    }
+			    catch(e) {
+				return;
+			    }
+			    role = new role();
+			    rolel.push(role.toString() + ' [' + role.maxPlayers + ']');
+			});
+			bot.send(chan, 'Implemented roles: ' + rolel.join(' '));
+			rate2 = false;
+			setTimeout(function() {
+			    rate = true;
+			}, 120000);
+		    });
+		}
+	    }
             if (data.cmd == '!ping') {
 		if (rate) {
-                bot.names(chan, function(er, names) {
-                    bot.send(chan, 'PING! ' + names.join(' '));
-                });
+                    bot.names(chan, function(er, names) {
+			away.forEach(function(name) {
+			    if (names.indexOf(name) !== -1) {
+				names.splice(names.indexOf(name), 1);
+			    }
+			});
+			names.splice(names.indexOf(nick), 1);
+			bot.send(chan, 'PING! ' + names.join(' '));
+                    });
 		    rate = false;
 		    setTimeout(function() {
 			rate = true;
