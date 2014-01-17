@@ -83,13 +83,13 @@ function reset() {
 	    bot.send(chan, c.bold('Game over!') + ' All the wolves are dead! The ' + c.bold.green('villagers') + ' chop them up, BBQ them and eat a hearty meal.');
 	}
 	_k(game.players).forEach(function(player) {
-	    if (game.players[player].canAct) {
+	    if (game.players[player].toString() !== 'villager') {
 		bot.send(chan, c.bold(game.players[player].name) + ' was a ' + c.bold(game.players[player].toString() + '.'));
 	    }
 	    bot.mode(chan, '-v', player);
 	});
         _k(game.dead).forEach(function(player) {
-            if (game.dead[player].canAct) {
+            if (game.dead[player].toString() !== 'villager') {
                 bot.send(chan, c.bold(game.dead[player].name) + ' was a ' + c.bold(game.dead[player].toString()) + '.');
             }
             bot.mode(chan, '-v-q', player);
@@ -155,14 +155,20 @@ function reset() {
             if (data.cmd == '!away') {
                 if (away.indexOf(data.from) == -1) {
 		    away.push(data.from);
+                    bot.notice(data.from, 'You are now marked as away.');
 		}
-		bot.notice(data.from, 'You are now marked as away.');
+		else {
+		    bot.notice(data.from, 'You are already marked as away.');
+		}
             }
             if (data.cmd == '!back') {
                 if (away.indexOf(data.from) !== -1) {
                     away.splice(away.indexOf(data.from), 1);
+                    bot.notice(data.from, 'You are no longer marked as away.');
                 }
-                bot.notice(data.from, 'You are no longer marked as away.');
+                else {
+                    bot.notice(data.from, 'You are not marked as away.');
+                }
             }
             if (data.cmd == '!stats') {
                 bot.send(chan, 'Players: ' + _k(game.players).join(' '));
@@ -178,6 +184,11 @@ function reset() {
 				names.splice(names.indexOf(name), 1);
 			    }
 			});
+                        _k(game.players).forEach(function(name) {
+                            if (names.indexOf(name) !== -1) {
+                                names.splice(names.indexOf(name), 1);
+                            }
+                        });
 			names.splice(names.indexOf(nick), 1);
 			bot.send(chan, 'PING! ' + names.join(' '));
                     });
