@@ -3,6 +3,7 @@ var _k = Object.keys;
 var util = require('util');
 var Chance = require('chance');
 var chance = new Chance();
+var fs = require('fs');
 var coffee = require('coffee-script');
 var EventEmitter = require('events').EventEmitter;
 var Wolfgame = function() {
@@ -129,43 +130,62 @@ var Wolfgame = function() {
     this.randomPlayer = function() {
         return _k(this.players)[chance.integer({min: 0, max: _k(this.players).length - 1})];
     };
-    this.allocate = function() {
-	// Allocate the roles
+    this.randomUPlayer = function() {
 	var roled = [];
-        roled.Wolf = this.randomPlayer();
-	roled.push(roled.Wolf);
-	delete this.players[roled.Wolf]; // Don't worry, we'll put it back later
-	roled.Seer = this.randomPlayer();
-	roled.push(roled.Seer);
-	delete this.players[roled.Seer];
-	if (_k(this.players).length >= 4) {
-	    roled.Cursed = this.randomPlayer();
-	    roled.push(roled.Cursed);
-	    delete this.players[roled.Cursed];
-	}
-        process.game = this;
-	roled.forEach(function(player) {
-	    if (player == roled.Wolf) {
-		process.game.players[player] = new process.game.Wolf(process.game);
-		process.game.players[player].name = player;
-	    }
-	    if (player == roled.Seer) {
-		process.game.players[player] = new process.game.Seer(process.game);
-                process.game.players[player].name = player;
-	    }
-	    if (player == roled.Cursed) {
-		process.game.players[player] = new process.game.Cursed(process.game);
-		process.game.players[player].name = player;
-	    }
-	});
-	var defvil = new this.Villager(this);
 	_k(this.players).forEach(function(player) {
-	    if (process.game.players[player] == 'unallocated') {
-		process.game.players[player] = defvil;
-                process.game.players[player].name = player;
+	    player = process.game.players[player];
+	    if (player != 'unallocated') {
+		roled.push(player);
+		delete process.game.players[player.name];
 	    }
 	});
-	return this.emit('night');
+        var chosen = _k(this.players)[chance.integer({min: 0, max: _k(this.players).length - 1})];
+	roled.forEach(function(p) {
+	    process.game.players[p.name] = p;
+	});
+	console.log('Picked random player: ' + chosen);
+	return chosen;
+    };
+    this.allocate = function() {
+	process.game = this;
+	fs.readdir(__dirname + '/roles', function(err, roles) {
+	    if (err) { // We're screwed
+		throw err;
+	    }
+	    var roled = [];
+	    roles.forEach(function(role) {
+		try {
+		    role = require(__dirname + '/roles/' + role);
+		}
+		catch(e) {
+		    console.log('Error reading role: ' + role, err);
+		    return;
+		}
+		role = new role(process.game);
+		if (role.toString() == 'villager') {
+		    return;
+		}
+		if (!role.minPlayers) {
+		    role.minPlayers = 0;
+		}
+                console.log('Loaded role: ' + role.toString() + ' (requires ' + role.minPlayers + ' players)');
+		if (_k(process.game.players).length >= role.minPlayers) {
+		    var torole = process.game.randomUPlayer();
+		    console.log('Allocating role: ' + role.toString() + ' to player ' + torole);
+		    process.game.players[torole] = role;
+		    process.game.players[torole].name = torole;
+		    console.log(process.game.players[torole].toString());
+		}
+	    });
+            var defvil = new process.game.Villager(this);
+            _k(process.game.players).forEach(function(player) {
+                if (process.game.players[player] == 'unallocated') {
+                    process.game.players[player] = defvil;
+                    process.game.players[player].name = player;
+                }
+            });
+            return process.game.emit('night');
+	});
     };
     this.on('join', function(data) {
 	if (this.phase != 'start') {
@@ -222,6 +242,9 @@ var Wolfgame = function() {
 		return;
 	    }
 	    p = process.game.players[p];
+            if (typeof p == 'undefined') {
+                return;
+            }
 	    if (p.canAct) {
 		p.acted = false;
 	    }

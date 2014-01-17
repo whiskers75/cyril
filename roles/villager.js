@@ -5,6 +5,7 @@ var Villager = function() {
     };
     this.onNight = false;
     this.acted = true;
+    this.minPlayers = 0;
     this.canAct = false;
     this.name = 'bob';
     this.actName = 'derp';
