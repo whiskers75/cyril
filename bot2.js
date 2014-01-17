@@ -176,7 +176,7 @@ function reset() {
 			}
 			roles.forEach(function(role) {
 			    try {
-				role = require(__dirname = '/node_modules/cywolf/roles' + role);
+				role = require(__dirname = '/node_modules/cywolf/roles/' + role);
 			    }
 			    catch(e) {
 				return;
