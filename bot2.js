@@ -131,6 +131,16 @@ function reset() {
             bot.removeAllListeners();
             game.removeAllListeners();
         }
+	if (data.cmd == '!fkill' && data.from == 'whiskers75') {
+	    if (_k(game.players).indexOf(data.args[1]) !== -1) {
+		if (game.phase != 'start') {
+		    game.kill(data.args[1], ' was smitten by an admin, ' + data.from + '.');
+		}
+		else {
+		    game.emit('quit', {player: data.args[1]});
+		}
+	    }
+	}
 	if (game.phase != 'start') {
 	    if (data.cmd == '!idle') {
 		if (_k(game.players).indexOf(data.args[1])) {
