@@ -7,6 +7,7 @@ var rate2 = true;
 var idletimes = {};
 var over = false;
 var away = [];
+var fs = require('fs');
 var Wolfgame = require('cywolf');
 var stream = net.connect({
     port: 6667,
