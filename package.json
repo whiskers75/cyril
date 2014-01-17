@@ -1,7 +1,7 @@
 {
-    "name": "cywolf",
+    "name": "cyril",
+    "description": "IRC frontend for cywolf",
     "version": "2.0.0",
-    "private": true,
     "scripts": {
 	"start": "node bot.js"
     },
@@ -10,6 +10,7 @@
 	"winston": "*",
 	"irc-colors": "*",
 	"chance": "*",
-	"coffee-script": "*"
+	"coffee-script": "*",
+	"cywolf": "*"
     }
 }

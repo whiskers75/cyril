@@ -4,7 +4,7 @@ var winston = require('winston');
 var net = require('net');
 var idletimes = {};
 var over = false;
-var Wolfgame = require('./wolfgame.js');
+var Wolfgame = require('cywolf');
 var stream = net.connect({
     port: 6667,
     host: 'irc.freenode.net'
