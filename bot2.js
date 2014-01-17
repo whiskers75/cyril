@@ -84,13 +84,13 @@ function reset() {
 	}
 	_k(game.players).forEach(function(player) {
 	    if (game.players[player].canAct) {
-		bot.send(chan, c.bold(player.name) + ' was a ' + c.bold(player.toString()));
+		bot.send(chan, c.bold(game.players[player].name) + ' was a ' + c.bold(game.players[player].toString() + '.'));
 	    }
 	    bot.mode(chan, '-v', player);
 	});
         _k(game.dead).forEach(function(player) {
             if (game.dead[player].canAct) {
-                bot.send(chan, c.bold(player.name) + ' was a ' + c.bold(player.toString()));
+                bot.send(chan, c.bold(game.dead[player].name) + ' was a ' + c.bold(game.dead[player].toString()) + '.');
             }
             bot.mode(chan, '-v-q', player);
         });
