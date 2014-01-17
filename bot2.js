@@ -83,13 +83,13 @@ function reset() {
 	    bot.send(chan, c.bold('Game over!') + ' All the wolves are dead! The ' + c.bold.green('villagers') + ' chop them up, BBQ them and eat a hearty meal.');
 	}
 	_k(game.players).forEach(function(player) {
-	    if (player.canAct) {
+	    if (game.players[player].canAct) {
 		bot.send(chan, c.bold(player.name) + ' was a ' + c.bold(player.toString()));
 	    }
 	    bot.mode(chan, '-v', player);
 	});
         _k(game.dead).forEach(function(player) {
-            if (player.canAct) {
+            if (game.dead[player].canAct) {
                 bot.send(chan, c.bold(player.name) + ' was a ' + c.bold(player.toString()));
             }
             bot.mode(chan, '-v-q', player);
@@ -168,29 +168,7 @@ function reset() {
                 bot.send(chan, 'Players: ' + _k(game.players).join(' '));
             }
 	    if (data.cmd == '!roles') {
-		if (rate2) {
-		    var rolel = [];
-                    fs.readdir(__dirname + '/node_modules/cywolf/roles', function(err, roles) {
-			if (err) {
-			    return;
-			}
-			roles.forEach(function(role) {
-			    try {
-				role = require(__dirname = '/node_modules/cywolf/roles/' + role);
-			    }
-			    catch(e) {
-				return;
-			    }
-			    role = new role();
-			    rolel.push(role.toString() + ' [' + role.maxPlayers + ']');
-			});
-			bot.send(chan, 'Implemented roles: ' + rolel.join(' '));
-			rate2 = false;
-			setTimeout(function() {
-			    rate = true;
-			}, 120000);
-		    });
-		}
+		bot.notice(data.from, 'This command is not implemented.');
 	    }
             if (data.cmd == '!ping') {
 		if (rate) {
