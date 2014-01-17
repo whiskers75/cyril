@@ -11,6 +11,6 @@
 	"irc-colors": "*",
 	"chance": "*",
 	"coffee-script": "*",
-	"cywolf": "*"
+	"cywolf": "git://github.com/whiskers75/cywolf#master"
     }
 }

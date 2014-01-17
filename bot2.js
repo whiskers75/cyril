@@ -142,6 +142,22 @@ function reset() {
 	    }
 	}
 	if (game.phase != 'start') {
+            if (data.cmd == '!stats') {
+                bot.send(chan, 'Players: ' + _k(game.players).join(' '));
+		var stats = {};
+		_k(game.players).forEach(function(player) {
+		    if (game.players[player].toString !== 'villager') {
+                        if (!stats[game.players[player].toString()]) {
+                            stats[game.players[player].toString()] = 0;
+			}
+			stats[game.players[player].toString()]++;
+		    }
+		});
+		bot.send(chan, 'It is currently ' + game.phase + '. ');
+		_k(stats).forEach(function(role) {
+		    bot.send(chan, 'There is ' + stats[role] + ' ' + role + '.');
+		});
+            }
 	    if (data.cmd == '!idle') {
 		if (_k(game.players).indexOf(data.args[1])) {
 		    if ((new Date().getTime()) - idletimes[data.args[1]] >= 100) {
@@ -184,7 +200,9 @@ function reset() {
                 bot.send(chan, 'Players: ' + _k(game.players).join(' '));
             }
 	    if (data.cmd == '!roles') {
-		bot.notice(data.from, 'This command is not implemented.');
+		if (game.listRoles) {
+		    bot.send(chan, 'Implemented roles: ' + game.listRoles());
+		}
 	    }
             if (data.cmd == '!ping') {
 		if (rate) {
