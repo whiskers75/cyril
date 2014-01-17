@@ -201,7 +201,9 @@ function reset() {
             }
 	    if (data.cmd == '!roles') {
 		if (game.listRoles) {
-		    bot.send(chan, 'Implemented roles: ' + game.listRoles());
+		    game.listRoles(function(c) {
+			bot.send(chan, 'Implemented roles: ' + c);
+		    });
 		}
 	    }
             if (data.cmd == '!ping') {
