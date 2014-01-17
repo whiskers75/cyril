@@ -234,7 +234,7 @@ function reset() {
 	}, _k(process.game.players).length * 60000));
         game.timeouts.push(setTimeout(function() {
             if (game.phase == 'day') {
-                bot.send(chan, c.bold('As the sun sinks inexorably toward the horizon, the villagers are reminded that they only have one more minute to make their decision.'));
+                bot.send(chan, c.bold('As the sun sinks inexorably toward the horizon, the villagers are reminded that they only have one more minute to make their decision, otherwise the sun will set and night will fall.'));
             }
         }, (_k(process.game.players).length * 60000) - 60000));
     });
