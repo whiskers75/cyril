@@ -2,6 +2,7 @@ var irc = require('slate-irc');
 var c = require('irc-colors');
 var winston = require('winston');
 var net = require('net');
+var rate = true;
 var idletimes = {};
 var over = false;
 var Wolfgame = require('cywolf');
@@ -157,11 +158,20 @@ function reset() {
             if (data.cmd == '!stats') {
                 bot.send(chan, 'Players: ' + _k(game.players).join(' '));
             }
-            if (data.cmd == '!ping' && data.from == 'whiskers75') {
+            if (data.cmd == '!ping') {
+		if (rate) {
                 bot.names(chan, function(er, names) {
-                    bot.send(chan, 'PING (by operator)! ' + names.join(' '));
+                    bot.send(chan, 'PING! ' + names.join(' '));
                 });
-            }
+		    rate = false;
+		    setTimeout(function() {
+			rate = true;
+		    }, 120000);
+		}
+		else {
+		    bot.notice(data.from, 'This command is ratelimited.');
+		}
+	    }
             if (data.cmd == '!voices' && data.from == 'whiskers75') {
                 bot.names(chan, function(er, name) {
                     bot.mode(chan, '-v', name);
