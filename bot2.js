@@ -84,14 +84,14 @@ function reset() {
 	}
 	var endstr = '';
 	_k(game.players).forEach(function(player) {
-	    if (game.players[player].toString() !== 'villager') {
-		 endstr += c.bold(game.players[player].name) + ' was a ' + c.bold(game.players[player].toString()) + '. ';
+	    if (game.players[player].role.toString() !== 'villager') {
+		 endstr += c.bold(game.players[player].name) + ' was a ' + c.bold(game.players[player].role.toString()) + '. ';
 	    }
 	    bot.mode(chan, '-v', player);
 	});
         _k(game.dead).forEach(function(player) {
-            if (game.dead[player].toString() !== 'villager') {
-                endstr += c.bold(game.dead[player].name) + ' was a ' + c.bold(game.dead[player].toString()) + '. ';
+            if (game.dead[player].role.toString() !== 'villager') {
+                endstr += c.bold(game.dead[player].name) + ' was a ' + c.bold(game.dead[player].role.toString()) + '. ';
             }
             bot.mode(chan, '-v-q', player);
         });
@@ -148,11 +148,11 @@ function reset() {
                 bot.send(chan, 'Players: ' + _k(game.players).join(' '));
 		var stats = {};
 		_k(game.players).forEach(function(player) {
-		    if (game.players[player].toString !== 'villager') {
-                        if (!stats[game.players[player].toString()]) {
-                            stats[game.players[player].toString()] = 0;
+		    if (game.players[player].role.toString !== 'villager') {
+                        if (!stats[game.players[player].role.toString()]) {
+                            stats[game.players[player].role.toString()] = 0;
 			}
-			stats[game.players[player].toString()]++;
+			stats[game.players[player].role.toString()]++;
 		    }
 		});
 		bot.send(chan, 'It is currently ' + game.phase + '. ');
@@ -248,12 +248,12 @@ function reset() {
             }
         }
         if (game.phase == 'night' && data.to == nick && _k(game.players).indexOf(data.from) !== -1) {
-            if (game.players[data.from].canAct && data.cmd == game.players[data.from].actName) {
-                if (game.players[data.from].canAct && !game.players[data.from].acted) {
-                    game.players[data.from].act(data.args[1]);
+            if (game.players[data.from].role.canAct && data.cmd == game.players[data.from].role.actName) {
+                if (game.players[data.from].role.canAct && !game.players[data.from].role.acted) {
+                    game.players[data.from].role.act(data.args[1]);
                     var done = true;
                     _k(game.players).forEach(function(player) {
-                        if (!game.players[player].acted && game.players[player].canAct) {
+                        if (!game.players[player].role.acted && game.players[player].role.canAct) {
                             done = false;
                         }
                     });
@@ -269,7 +269,7 @@ function reset() {
             }
         }
 	if (data.to == nick && game.players[data.from]) {
-	    if (game.players[data.from].team == 'wolf') {
+	    if (game.players[data.from].role.team == 'wolf') {
 		_k(game.players).forEach(function(player) {
 		    bot.send(player.name, c.bold(data.from) + ' says: ' + data.message);
 		});
