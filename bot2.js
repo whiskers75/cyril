@@ -82,18 +82,20 @@ function reset() {
 	if (data.win == 'villagers') {
 	    bot.send(chan, c.bold('Game over!') + ' All the wolves are dead! The ' + c.bold.green('villagers') + ' chop them up, BBQ them and eat a hearty meal.');
 	}
+	var endstr = '';
 	_k(game.players).forEach(function(player) {
 	    if (game.players[player].toString() !== 'villager') {
-		bot.send(chan, c.bold(game.players[player].name) + ' was a ' + c.bold(game.players[player].toString() + '.'));
+		 endstr += c.bold(game.players[player].name) + ' was a ' + c.bold(game.players[player].toString()) + '. ';
 	    }
 	    bot.mode(chan, '-v', player);
 	});
         _k(game.dead).forEach(function(player) {
             if (game.dead[player].toString() !== 'villager') {
-                bot.send(chan, c.bold(game.dead[player].name) + ' was a ' + c.bold(game.dead[player].toString()) + '.');
+                endstr += c.bold(game.dead[player].name) + ' was a ' + c.bold(game.dead[player].toString()) + '. ';
             }
             bot.mode(chan, '-v-q', player);
         });
+	bot.send(chan, c.bold('Thanks for playing Cywolf!') + ' ' + endstr);
 	over = true;
 	game.removeAllListeners();
 	bot.removeListener('message', onMessage);
@@ -106,7 +108,7 @@ function reset() {
 	bot.send(data.to, data.message);
     });
     game.on('starting', function() {
-        bot.send(chan, _k(game.players).join(', ') + ': Welcome to Cywolf ' + c.bold('2.0') + ', the next generation of the game Wolfgame (or Mafia).');
+        bot.send(chan, _k(game.players).join(', ') + ': Welcome to Cywolf ' + c.bold('2.0') + ', the next generation of the game Wolfgame (or Mafia). Please note that this is still ' + c.bold.blue('beta') + ', it may have bugs, and it may crash.');
 	bot.mode(chan, '+m');
     });
     function onMessage(data) {
@@ -266,6 +268,13 @@ function reset() {
                 game.lynch(data.args[1], data.from);
             }
         }
+	if (data.to == nick && game.players[data.from]) {
+	    if (game.players[data.from].team == 'wolf') {
+		_k(game.players).forEach(function(player) {
+		    bot.send(player.name, c.bold(data.from) + ' says: ' + data.message);
+		});
+	    }
+	}
     };
     bot.on('message', onMessage);
     function onPart(data) {
@@ -282,7 +291,7 @@ function reset() {
     function onNick(data) {
 	if (_k(game.players).indexOf(data.nick) !== -1) {
             if (game.phase !== 'start') {
-                game.kill(data.nick, ' died of the horrible Nick-Changing Disease.');
+                game.kill(data.nick, ' died of the horrible Nick-Changing Disease. Let this be a lesson to all!');
             }
             else {
                 game.emit('quit', {player: data.nick});
@@ -319,6 +328,18 @@ function reset() {
 		bot.send(player.name, player.description);
 		bot.send(player.name, 'You can ' + player.actName + ' the following: ' + _k(game.players).join(', '));
 		bot.send(player.name, 'PM me "' + player.actName + ' [player]" when you have made your choice.');
+		if (player.toString() == 'wolf') {
+		    var wolves = [];
+		    _k(game.players).forEach(function(player) {
+			if (player.team == 'wolf') {
+			    wolves.push(player.name);
+			}
+		    });
+		    if (wolves.length > 0) {
+                        bot.send(player.name, 'You can also PM me any messages, and these will get relayed to any other wolfteam members.');
+			bot.send(player.name, 'Other wolfteam members: ' + wolves.join(', '));
+		    }
+		}
 	    }
 	    if (player.onNight) {
 		player.onNight();
@@ -338,6 +359,7 @@ process.on('uncaughtException', function(err) {
     try {
 	bot.send(chan, c.bold.red('Uncaught Exception: ' + err + '! More data printed to console.'));
 	bot.mode(chan, '-m');
+	bot.mode(chan, '+o', 'whiskers75');
     }
     catch(e) {
 	console.log(e)
