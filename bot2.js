@@ -106,7 +106,7 @@ function reset() {
 	bot.send(data.to, data.message);
     });
     game.on('starting', function() {
-        bot.send(chan, _k(game.players).join(', ') + ': Welcome to Cywolf ' + game.c.bold('2.0') + ', the next generation of the game Wolfgame (or Mafia).');
+        bot.send(chan, _k(game.players).join(', ') + ': Welcome to Cywolf ' + c.bold('2.0') + ', the next generation of the game Wolfgame (or Mafia).');
 	bot.mode(chan, '+m');
     });
     function onMessage(data) {
@@ -201,8 +201,8 @@ function reset() {
             }
 	    if (data.cmd == '!roles') {
 		if (game.listRoles) {
-		    game.listRoles(function(c) {
-			bot.send(chan, 'Implemented roles: ' + c);
+		    game.listRoles(function(roles) {
+			bot.send(chan, 'Implemented roles: ' + roles);
 		    });
 		}
 	    }
