@@ -267,6 +267,10 @@ function reset() {
             if (data.cmd == '!lynch' || data.cmd == '!vote') {
                 game.lynch(data.args[1], data.from);
             }
+	    if (data.cmd == '!retract') {
+		delete game.lynches[data.from];
+		bot.send(chan, c.bold(data.from) + ' retracted their vote.');
+	    }
         }
 	if (data.to == nick && game.players[data.from]) {
 	    if (game.players[data.from].role.team == 'wolf') {
