@@ -323,15 +323,15 @@ function reset() {
     game.on('night', function() {
 	_k(game.players).forEach(function(player) {
 	    player = game.players[player];
-	    if (player.canAct && !player.acted) {
-		bot.send(player.name, 'You are a ' + c.bold(player.toString()) + '.');
-		bot.send(player.name, player.description);
-		bot.send(player.name, 'You can ' + player.actName + ' the following: ' + _k(game.players).join(', '));
-		bot.send(player.name, 'PM me "' + player.actName + ' [player]" when you have made your choice.');
+	    if (player.role.canAct && !player.role.acted) {
+		bot.send(player.name, 'You are a ' + c.bold(player.role.toString()) + '.');
+		bot.send(player.name, player.role.description);
+		bot.send(player.name, 'You can ' + player.role.actName + ' the following: ' + _k(game.players).join(', '));
+		bot.send(player.name, 'PM me "' + player.role.actName + ' [player]" when you have made your choice.');
 		if (player.toString() == 'wolf') {
 		    var wolves = [];
 		    _k(game.players).forEach(function(player) {
-			if (player.team == 'wolf') {
+			if (player.role.team == 'wolf') {
 			    wolves.push(player.name);
 			}
 		    });
