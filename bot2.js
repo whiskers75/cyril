@@ -271,6 +271,7 @@ function reset() {
     });
     game.on('death', function(data) {
         bot.send(chan, c.bold('☠ ' + data.player) + (data.reason ? data.reason : ' was mauled by werewolves and died.') + ' After searching their pockets, it was revealed that they were a ' + c.bold(data.role) + '.');
+        bot.send(data.player, c.bold('☠ ' ) + ' You have died!');
 	bot.mode('#cywolf', '-v+q', data.player);
     });
     game.on('night', function() {
