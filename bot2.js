@@ -95,8 +95,6 @@ function reset() {
             over = true;
             game.removeAllListeners();
             bot.removeListener('message', onMessage);
-            bot.removeListener('part', onPart);
-            bot.removeListener('nick', onNick);
             reset();
 	}
         if (data.cmd == '!fdie' && data.from == 'whiskers75') {
