@@ -75,9 +75,6 @@ function reset() {
 	over = true;
 	game.removeAllListeners();
 	bot.removeListener('message', onMessage);
-	bot.removeListener('part', onPart);
-	bot.removeListener('nick', onNick);
-	clearInterval(idleint);
 	reset();
     });
     game.on('pm', function(data) {
