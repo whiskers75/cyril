@@ -325,26 +325,24 @@ process.on('uncaughtException', function(err) {
     }
     console.log(err + err.stack);
 });
-function onPart(data, g) {
-    g = g();
-    if (_k(g.players).indexOf(data.nick) !== -1) {
-	if (g.phase !== 'start') {
-	    g.kill(data.nick, ' left the village, and died.');
+function onPart(data) {
+    if (_k(game.players).indexOf(data.nick) !== -1) {
+	if (game.phase !== 'start') {
+	    game.kill(data.nick, ' left the village, and died.');
 	}
 	else {
-	    g.emit('quit', {player: data.nick});
+	    game.emit('quit', {player: data.nick});
 	}
     }
 }
 bot.on('part', onPart);
-function onNick(data, g) {
-    g = g();
-    if (_k(g.players).indexOf(data.nick) !== -1) {
-        if (g.phase !== 'start') {
-            g.kill(data.nick, ' died of the horrible Nick-Changing Disease. Let this be a lesson to all!');
+function onNick(data) {
+    if (_k(game.players).indexOf(data.nick) !== -1) {
+        if (game.phase !== 'start') {
+            game.kill(data.nick, ' died of the horrible Nick-Changing Disease. Let this be a lesson to all!');
         }
         else {
-            g.emit('quit', {player: data.nick});
+            game.emit('quit', {player: data.nick});
         }
     }
 }
