@@ -1,7 +1,7 @@
 {
     "name": "cyril",
     "description": "IRC frontend for cywolf",
-    "version": "0.1.5",
+    "version": "2.1.5",
     "scripts": {
 	"start": "node bot.js"
     },

@@ -13,15 +13,6 @@ var stream = net.connect({
     port: 6667,
     host: 'irc.freenode.net'
 });
-function clone(obj) {
-    if (null == obj || "object" != typeof obj) return obj;
-    var copy = obj.constructor();
-    for (var attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-    }
-    return copy;
-}
-
 var bot = irc(stream);
 var nick = process.env.NICK || 'cywolf2';
 var chan = process.env.CHAN || '#cywolf';
@@ -31,31 +22,16 @@ bot.pass(process.env.PASSWORD);
 bot.nick(nick);
 bot.user('cywolf', 'Cywolf 2');
 bot.join(chan);
-String.prototype.repeat = function( num ) {
-    return new Array( num + 1 ).join( this );
-};
 var game = new Wolfgame();
-var idleint;
+function g() {
+    return game;
+}
 function reset() {
     winston.info('Cywolf 2 reset!');
     bot.mode(chan, '-m');
     bot.send(chan, 'Welcome to Cywolf 2. Start a game with !join.');
     game = new game.constructor();
-    idleint = setInterval(function() {
-        if (game.phase !== 'start') {
-            _k(game.players).forEach(function(player) {
-                if ((new Date().getTime / 1000) - idletimes[player] >= 120) {
-                    bot.send(player, c.bold.red('You have been idling for a while. Say something soon in ' + chan + ' or you may be declared dead.'));
-                }
-                if ((new Date().getTime / 1000) - idletimes[player] >= 150) {
-                    game.kill(player, ' didn\'t get out of bed for a long time and died.');
-                }
-            });
-        }
-    }, 5000);
-    setTimeout(function() {
-	over = false;
-    }, 5000);
+    over = false;
     game.on('joined', function(data) {
         bot.mode(chan, '+v', data.player);
 	if (_k(game.players).length == 1) {
@@ -85,7 +61,7 @@ function reset() {
 	var endstr = '';
 	_k(game.players).forEach(function(player) {
 	    if (game.players[player].role.toString() !== 'villager') {
-		 endstr += c.bold(game.players[player].name) + ' was a ' + c.bold(game.players[player].role.toString()) + '. ';
+		endstr += c.bold(game.players[player].name) + ' was a ' + c.bold(game.players[player].role.toString()) + '. ';
 	    }
 	    bot.mode(chan, '-v', player);
 	});
@@ -279,30 +255,9 @@ function reset() {
 		});
 	    }
 	}
-    };
-    bot.on('message', onMessage);
-    function onPart(data) {
-	if (_k(game.players).indexOf(data.nick) !== -1) {
-	    if (game.phase !== 'start') {
-		game.kill(data.nick, ' left the village, and died.');
-	    }
-	    else {
-		game.emit('quit', {player: data.nick});
-	    }
-	}
-    };
-    bot.on('part', onPart);
-    function onNick(data) {
-	if (_k(game.players).indexOf(data.nick) !== -1) {
-            if (game.phase !== 'start') {
-                game.kill(data.nick, ' died of the horrible Nick-Changing Disease. Let this be a lesson to all!');
-            }
-            else {
-                game.emit('quit', {player: data.nick});
-            }
-	}
     }
-    bot.on('nick', onNick);
+    bot.on('message', onMessage);
+    
     game.on('day', function() {
         bot.send(chan, c.bold('☀') + ' It is now day.');
     });
@@ -370,3 +325,27 @@ process.on('uncaughtException', function(err) {
     }
     console.log(err + err.stack);
 });
+function onPart(data, g) {
+    g = g();
+    if (_k(g.players).indexOf(data.nick) !== -1) {
+	if (g.phase !== 'start') {
+	    g.kill(data.nick, ' left the village, and died.');
+	}
+	else {
+	    g.emit('quit', {player: data.nick});
+	}
+    }
+}
+bot.on('part', onPart);
+function onNick(data, g) {
+    g = g();
+    if (_k(g.players).indexOf(data.nick) !== -1) {
+        if (g.phase !== 'start') {
+            g.kill(data.nick, ' died of the horrible Nick-Changing Disease. Let this be a lesson to all!');
+        }
+        else {
+            g.emit('quit', {player: data.nick});
+        }
+    }
+}
+bot.on('nick', onNick);
