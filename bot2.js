@@ -95,7 +95,6 @@ game.on('gameover', function (data) {
     });
     bot.send(chan, c.bold('Thanks for playing Cywolf!') + ' ' + endstr);
     game.removeAllListeners();
-    bot.removeListener('message', onMessage);
     reset();
 });
 game.on('pm', function (data) {
@@ -107,6 +106,9 @@ game.on('starting', function () {
 });
 
 function onMessage(data) {
+    if (game.over) {
+        return;
+    }
     idletimes[data.from] = new Date().getTime() / 1000;
     data.cmd = data.message.split(' ')[0];
     data.args = data.message.split(' ');
@@ -116,7 +118,6 @@ function onMessage(data) {
         });
         over = true;
         game.removeAllListeners();
-        bot.removeListener('message', onMessage);
         reset();
     }
     if (data.cmd == '!fkill' && data.from == 'whiskers75') {
