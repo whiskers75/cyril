@@ -10,12 +10,12 @@ var away = [];
 var fs = require('fs');
 var Wolfgame = require('cywolf');
 var stream = net.connect({
-    port: process.env.IRC_PORT,
-    host: process.env.IRC_HOST
+    port: 6667,
+    host: 'chat.freenode.net'
 });
 var bot = irc(stream);
-var nick = process.env.NICK || 'cywolf';
-var chan = process.env.CHAN || '#cywolf';
+var nick = 'cywolf';
+var chan = '#cywolf';
 var _k = Object.keys;
 bot.pass(process.env.PASSWORD);
 bot.nick(nick);
@@ -149,7 +149,7 @@ function onMessage(data) {
     if (data.cmd == '!quit' || data.cmd == '!leave') {
         if (game.phase == 'start') {
             game.emit('quit', {
-                player: data.from.toString()
+                player: data.from
             });
         } else {
             game.kill(data.from, ' was killed by a horrible disease.');
@@ -158,7 +158,7 @@ function onMessage(data) {
     if (game.phase == 'start') {
         if (data.cmd == '!join') {
             game.emit('join', {
-                player: data.from.toString()
+                player: data.from
             });
         }
         if (data.cmd == '!away') {
@@ -248,14 +248,6 @@ function onMessage(data) {
             delete game.lynches[data.from];
             bot.send(chan, c.bold(data.from) + ' retracted their vote.');
         }
-    }
-    if (game.phase != 'start') {
-        _k(game.players).forEach(function (player) {
-            player = game.players[player];
-            if (_k(player.role.commands).indexOf(data.cmd) !== -1 && data.from == player.name) {
-                player.role.commands[data.cmd](data.args)
-            }
-        });
     }
 }
 bot.on('message', onMessage);
