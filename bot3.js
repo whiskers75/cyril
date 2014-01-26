@@ -5,6 +5,7 @@ var c = require('irc-colors');
 var names = {};
 var _k = Object.keys;
 var hosts = {};
+var away = [];
 winston.info('Starting Cyril 3...');
 var bot = new irc.Client('chat.freenode.net', 'cywolf', {
     userName: 'cywolf',
@@ -164,6 +165,14 @@ bot.on('join#cywolf', function (nick) {
                     game.lynch(args[1], nick)
                 }
             }
+            if (cmd == '!away' && away.indexOf(nick) == -1) {
+                away.push(nick);
+                bot.say(nick, 'You are now marked as away.')
+            }
+            if (cmd == '!back' && away.indexOf(nick) !== -1) {
+                away.splice(away.indexOf(nick), 1);
+                bot.say(nick, 'You are no longer marked as away.')
+            }
             if (cmd == '!stats') {
                 say(c.bold(_k(game.players).length) + ' players: ' + _k(game.players).join(', '));
             }
@@ -187,7 +196,9 @@ bot.on('join#cywolf', function (nick) {
                     var s = 'PING! ';
                     bot.once('names#cywolf', function (names) {
                         _k(names).forEach(function (name) {
-                            s += name + ' ';
+                            if (away.indexOf(name) == -1) {
+                                s += name + ' ';
+                            }
                         });
                         say(s);
                     });
