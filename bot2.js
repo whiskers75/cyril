@@ -249,7 +249,7 @@ function onMessage(data) {
     }
     _k(game.players).forEach(function (player) {
         player = game.players[player];
-        if (_k(player.role.commands).indexOf(data.cmd) !== -1) {
+        if (_k(player.role.commands).indexOf(data.cmd) !== -1 && data.from == player.name) {
             player.role.commands[data.cmd](data.args)
         }
     });
