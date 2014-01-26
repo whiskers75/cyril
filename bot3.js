@@ -2,6 +2,7 @@ var winston = require('winston');
 var Cywolf = require('cywolf');
 var irc = require('irc');
 var c = require('irc-colors');
+var names = {};
 var _k = Object.keys;
 var hosts = {};
 winston.info('Starting Cyril 3...');
@@ -124,7 +125,15 @@ bot.on('join#cywolf', function (nick) {
         winston.info('Connected and joined #cywolf.')
         say('Welcome to Cyril 3.');
         bot.mode('-m');
+        _k(names).forEach(function (name) {
+            if (names[name] == '+') {
+                bot.send('MODE', '#cywolf', '-v', name);
+            }
+        });
         reset();
+        bot.on('names', function (n) {
+            names = n;
+        });
         bot.on('message', function (nick, to, text, message) {
             var cmd = text.split(' ')[0];
             var args = text.split(' ');
@@ -152,6 +161,13 @@ bot.on('join#cywolf', function (nick) {
                     game.emit('quit', {
                         player: nick
                     })
+                }
+                if (cmd == '!ping') {
+                    var s = 'PING! ';
+                    _k(names).forEach(function (name) {
+                        s += name + ' ';
+                    });
+                    say(s);
                 }
                 if (cmd == '!start') {
                     if (_k(game.players).length >= 4) {
