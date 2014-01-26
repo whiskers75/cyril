@@ -50,6 +50,7 @@ function reset() {
 }
 game.on('joined', function (data) {
     bot.mode(chan, '+v', data.player);
+    winston.info(data.player + ' joined Cywolf.')
     if (_k(game.players).length == 1) {
         bot.send(chan, c.bold(data.player) + ' started a game of Cywolf. !join to join, !quit to leave, and !start to start.');
     } else {
@@ -58,6 +59,7 @@ game.on('joined', function (data) {
 });
 game.on('quitted', function (data) {
     bot.mode(chan, '-v', data.player);
+    winston.info(data.player + ' quit Cywolf.')
     bot.send(chan, c.bold(data.player) + ' quit Cywolf. ' + c.bold(_k(game.players).length) + ' people playing.');
 });
 game.on('lynch', function (data) {
