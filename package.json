@@ -6,11 +6,9 @@
         "start": "node bot.js"
     },
     "dependencies": {
-        "slate-irc": "*",
+        "irc": "*",
         "winston": "*",
         "irc-colors": "*",
-        "chance": "*",
-        "coffee-script": "*",
         "cywolf": "git://github.com/WhiskTech/cywolf#develop"
     }
 }
