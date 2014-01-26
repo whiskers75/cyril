@@ -30,7 +30,7 @@ try {
     var thispkg = require('./package.json');
     cyrilver = thispkg.version;
     winston.info('Determined Cyril version: ' + cyrilver);
-    var thatpkg = require('./node_modules/cywolf/packag$e.json');
+    var thatpkg = require('./node_modules/cywolf/package.json');
     cywolfver = thatpkg.version;
     winston.info('Determined Cywolf version: ' + cywolfver);
 } catch (e) {
