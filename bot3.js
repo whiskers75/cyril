@@ -185,10 +185,13 @@ bot.on('join#cywolf', function (nick) {
 
                 if (cmd == '!ping') {
                     var s = 'PING! ';
-                    _k(names).forEach(function (name) {
-                        s += name + ' ';
+                    bot.once('names', function (names) {
+                        _k(names).forEach(function (name) {
+                            s += name + ' ';
+                        });
+                        say(s);
                     });
-                    say(s);
+                    bot.send('NAMES', '#cywolf')
                 }
                 if (cmd == '!start') {
                     if (_k(game.players).length >= 4) {
