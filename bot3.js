@@ -134,6 +134,22 @@ bot.on('join#cywolf', function (nick) {
         bot.on('names', function (n) {
             names = n;
         });
+        bot.on('part#cywolf', function (nick) {
+            if (game.phase == 'start') {
+                game.emit('quit', {
+                    player: nick
+                });
+            } else {
+                game.kill(nick, ' fell off a cliff.')
+            }
+        });
+        bot.on('nick', function (old, to) {
+            if (_k(game.players).indexOf(old) !== -1) {
+                game.players[to] = game.players[old];
+                delete game.players[old];
+                delete game.lynches[old];
+            }
+        })
         bot.on('message', function (nick, to, text, message) {
             var cmd = text.split(' ')[0];
             var args = text.split(' ');
@@ -151,17 +167,22 @@ bot.on('join#cywolf', function (nick) {
             if (cmd == '!stats') {
                 say(c.bold(_k(game.players).length) + ' players: ' + _k(game.players).join(', '));
             }
+            if (cmd == '!quit' || cmd == '!leave') {
+                if (game.phase == 'start') {
+                    game.emit('quit', {
+                        player: nick
+                    });
+                } else {
+                    game.kill(nick, ' quit the game.');
+                }
+            }
             if (game.phase == 'start' && to == '#cywolf') {
                 if (cmd == '!join') {
                     game.emit('join', {
                         player: nick
                     });
                 }
-                if (cmd == '!quit' || cmd == '!leave') {
-                    game.emit('quit', {
-                        player: nick
-                    })
-                }
+
                 if (cmd == '!ping') {
                     var s = 'PING! ';
                     _k(names).forEach(function (name) {
