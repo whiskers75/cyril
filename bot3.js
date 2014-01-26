@@ -131,7 +131,7 @@ bot.on('join#cywolf', function (nick) {
             }
         });
         reset();
-        bot.on('names', function (n) {
+        bot.on('names#cywolf', function (n) {
             names = n;
         });
         bot.on('part#cywolf', function (nick) {
@@ -185,7 +185,7 @@ bot.on('join#cywolf', function (nick) {
 
                 if (cmd == '!ping') {
                     var s = 'PING! ';
-                    bot.once('names', function (names) {
+                    bot.once('names#cywolf', function (names) {
                         _k(names).forEach(function (name) {
                             s += name + ' ';
                         });
