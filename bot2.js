@@ -247,12 +247,14 @@ function onMessage(data) {
             bot.send(chan, c.bold(data.from) + ' retracted their vote.');
         }
     }
-    _k(game.players).forEach(function (player) {
-        player = game.players[player];
-        if (_k(player.role.commands).indexOf(data.cmd) !== -1 && data.from == player.name) {
-            player.role.commands[data.cmd](data.args)
-        }
-    });
+    if (game.phase != 'start') {
+        _k(game.players).forEach(function (player) {
+            player = game.players[player];
+            if (_k(player.role.commands).indexOf(data.cmd) !== -1 && data.from == player.name) {
+                player.role.commands[data.cmd](data.args)
+            }
+        });
+    }
 }
 bot.on('message', onMessage);
 game.on('tolynch', function () {
@@ -288,14 +290,6 @@ game.on('night', function () {
         }
     });
     bot.send(chan, c.bold('☾') + ' It is now ' + c.bold('night') + '. All players check for PMs from me for instructions. If you did not recieve one, simply sit back, relax and wait until morning (max 2 mins).');
-});
-
-
-bot.on('join', function (data) {
-    if (data.nick != nick) {
-        return;
-    }
-    reset();
 });
 process.on('uncaughtException', function (err) {
     try {
@@ -333,3 +327,4 @@ function onNick(data) {
     }
 }
 bot.on('nick', onNick);
+reset();
