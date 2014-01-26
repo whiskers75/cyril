@@ -14,12 +14,12 @@ var stream = net.connect({
     host: process.env.IRC_HOST
 });
 var bot = irc(stream);
-var nick = process.env.NICK || 'cywolf2';
+var nick = process.env.NICK || 'cywolf';
 var chan = process.env.CHAN || '#cywolf';
 var _k = Object.keys;
 bot.pass(process.env.PASSWORD);
 bot.nick(nick);
-bot.user('cywolf', 'Cywolf 2');
+bot.user('cywolf', 'Cywolf');
 bot.join(chan);
 var game = new Wolfgame();
 winston.info('Starting Cyril...');
@@ -30,7 +30,7 @@ try {
     var thispkg = require('./package.json');
     cyrilver = thispkg.version;
     winston.info('Determined Cyril version: ' + cyrilver);
-    var thatpkg = require('./node_modules/cywolf/package.json');
+    var thatpkg = require('./node_modules/cywolf/packag$e.json');
     cywolfver = thatpkg.version;
     winston.info('Determined Cywolf version: ' + cywolfver);
 } catch (e) {
@@ -42,9 +42,9 @@ function g() {
 }
 
 function reset() {
-    winston.info('Cywolf 2 reset!');
+    winston.info('Cywolf reset!');
     bot.mode(chan, '-m');
-    bot.send(chan, 'Welcome to Cywolf 2. Start a game with !join.');
+    bot.send(chan, 'Welcome to Cywolf ' + cywolfver + ' (cyril ' + cyrilver + '). Start a game with !join.');
     game = new game.constructor();
     over = false;
 }
@@ -88,10 +88,12 @@ game.on('gameover', function (data) {
         devoice.push(player);
     });
     devoice.forEach(function (player) {
+
         bot.mode(chan, '-v', player);
     });
     bot.send(chan, c.bold('Thanks for playing Cywolf!') + ' ' + endstr);
     game.removeAllListeners();
+    bot.removeListener('message', onMessage);
     reset();
 });
 game.on('pm', function (data) {
@@ -112,19 +114,15 @@ function onMessage(data) {
         });
         over = true;
         game.removeAllListeners();
+        bot.removeListener('message', onMessage);
         reset();
-    }
-    if (data.cmd == '!fdie' && data.from == 'whiskers75') {
-        bot.send(chan, c.bold.red('Software Update initiated...'));
-        bot.send(chan, c.bold.red('Waiting for update...'));
-        bot.removeAllListeners();
-        game.removeAllListeners();
     }
     if (data.cmd == '!fkill' && data.from == 'whiskers75') {
         if (_k(game.players).indexOf(data.args[1]) !== -1) {
             if (game.phase != 'start') {
                 game.kill(data.args[1], ' was smitten by an admin, ' + data.from + '.');
             } else {
+                $
                 game.emit('quit', {
                     player: data.args[1]
                 });
@@ -146,16 +144,18 @@ function onMessage(data) {
             }
         }
     }
-    if (game.phase == 'start') {
-        if (data.cmd == '!join') {
-
-            game.emit('join', {
+    if (data.cmd == '!quit' || data.cmd == '!leave') {
+        if (game.phase == 'start') {
+            game.emit('quit', {
                 player: data.from.toString()
             });
+        } else {
+            game.kill(data.from, ' was killed by a horrible disease.');
         }
-        if (data.cmd == '!quit' || data.cmd == '!leave') {
-
-            game.emit('quit', {
+    }
+    if (game.phase == 'start') {
+        if (data.cmd == '!join') {
+            game.emit('join', {
                 player: data.from.toString()
             });
         }
@@ -247,19 +247,14 @@ function onMessage(data) {
             bot.send(chan, c.bold(data.from) + ' retracted their vote.');
         }
     }
-    if (data.to == nick && game.players[data.from]) {
-        if (game.players[data.from].role.team == 'wolf') {
-            _k(game.players).forEach(function (player) {
-                bot.send(player.name, c.bold(data.from) + ' says: ' + data.message);
-            });
+    _k(game.players).forEach(function (player) {
+        player = game.players[player];
+        if (_k(player.role.commands).indexOf(data.cmd) !== -1) {
+            player.role.commands[data.cmd](data.args)
         }
-    }
+    });
 }
 bot.on('message', onMessage);
-
-game.on('day', function () {
-    bot.send(chan, c.bold('☀') + ' It is now day.');
-});
 game.on('tolynch', function () {
     bot.send(chan, 'The villagers must now decide who to lynch. Use ' + c.bold('!lynch [player]') + ' to do so.');
     bot.send(chan, 'A majority of ' + c.bold(_k(process.game.players).length - (_k(process.game.players).length > 4 ? 2 : 1)) + ' votes will lynch. The villagers have only ' + c.bold(_k(process.game.players).length + ' minutes') + ' to lynch, otherwise the sun will set and night will fall.');
@@ -287,18 +282,6 @@ game.on('night', function () {
             bot.send(player.name, player.role.description);
             bot.send(player.name, 'You can ' + player.role.actName + ' the following: ' + _k(game.players).join(', '));
             bot.send(player.name, 'PM me "' + player.role.actName + ' [player]" when you have made your choice.');
-            if (player.toString() == 'wolf') {
-                var wolves = [];
-                _k(game.players).forEach(function (player) {
-                    if (player.role.team == 'wolf') {
-                        wolves.push(player.name);
-                    }
-                });
-                if (wolves.length > 0) {
-                    bot.send(player.name, 'You can also PM me any messages, and these will get relayed to any other wolfteam members.');
-                    bot.send(player.name, 'Other wolfteam members: ' + wolves.join(', '));
-                }
-            }
         }
         if (player.onNight) {
             player.onNight();
