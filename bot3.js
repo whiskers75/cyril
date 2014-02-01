@@ -137,6 +137,9 @@ bot.on('join#cywolf', function (nick) {
             names = n;
         });
         bot.on('part#cywolf', function (nick) {
+            if (_k(game.players).indexOf(nick) == -1) {
+                return;
+            }
             if (game.phase == 'start') {
                 game.emit('quit', {
                     player: nick
