@@ -98,7 +98,8 @@ function reset() {
         winston.info('It is now night.');
         _k(game.players).forEach(function (player) {
             player = game.players[player];
-            if (player.role.canAct && !player.role.acted) {
+            if (player.role.canAct) {
+                player.role.acted = false;
                 bot.say(player.name, 'You are a ' + c.bold(player.role.toString()) + '.');
                 bot.say(player.name, player.role.description);
                 bot.say(player.name, 'You can ' + player.role.actName + ' the following: ' + _k(game.players).join(', '));
@@ -141,7 +142,7 @@ bot.on('join#cywolf', function (nick) {
                     player: nick
                 });
             } else {
-                game.kill(nick, ' fell off a cliff.')
+                game.kill(nick, ' fell off a cliff.');
             }
         });
         bot.on('nick', function (old, to) {
